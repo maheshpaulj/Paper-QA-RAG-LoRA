@@ -1,0 +1,276 @@
+[
+  {
+    "id": "resnet_q1",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What happens to the magnitude of responses as a ResNet becomes deeper?",
+    "gold_snippets": [
+      "We also notice that the deeper ResNet has smaller magni- tudes of responses, as evidenced by the comparisons among ResNet-20, 56, and 110 in Fig. 7."
+    ],
+    "source_chunk": "C48"
+  },
+  {
+    "id": "resnet_q2",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "Why is option C marginally better than option B?",
+    "gold_snippets": [
+      "C is marginally better than B, and we attribute this to the extra parameters introduced by many (thirteen) projection shortcuts."
+    ],
+    "source_chunk": "C36"
+  },
+  {
+    "id": "resnet_q3",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What was the mAP achieved on the test-dev set by the winning model?",
+    "gold_snippets": [
+      "The mAP is 59.0% and 37.4% on the test-dev set."
+    ],
+    "source_chunk": "C72"
+  },
+  {
+    "id": "resnet_q4",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the purpose of shortcut connections in the formulation of F(x)+x?",
+    "gold_snippets": [
+      "The formulation of F(x)+x can be realized by feedfor- ward neural networks with “shortcut connections” (Fig. 2)."
+    ],
+    "source_chunk": "C7"
+  },
+  {
+    "id": "resnet_q5",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What method achieved an error of 8.75% on the dataset?",
+    "gold_snippets": [
+      "ResNet 20 0.27M 8.75"
+    ],
+    "source_chunk": "C42"
+  },
+  {
+    "id": "resnet_q6",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "How is the image resized for the ImageNet implementation?",
+    "gold_snippets": [
+      "The image is resized with its shorter side ran- domly sampled in [256, 480] for scale augmentation [41]."
+    ],
+    "source_chunk": "C24"
+  },
+  {
+    "id": "resnet_q7",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "How is down-sampling performed in the architectures listed in Table 1?",
+    "gold_snippets": [
+      "Down- sampling is performed by conv3 1, conv4 1, and conv5 1 with a stride of 2."
+    ],
+    "source_chunk": "C28"
+  },
+  {
+    "id": "resnet_q8",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What kind of connections turn a plain network into a residual version?",
+    "gold_snippets": [
+      "Based on the above plain network, we insert shortcut connections (Fig. 3, right) which turn the network into its counterpart residual version."
+    ],
+    "source_chunk": "C23"
+  },
+  {
+    "id": "resnet_q9",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the size of the input images for the network described?",
+    "gold_snippets": [
+      "The network inputs are 32×32 images, with the per-pixel mean subtracted."
+    ],
+    "source_chunk": "C41"
+  },
+  {
+    "id": "resnet_q10",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the top-5 localization error according to the text?",
+    "gold_snippets": [
+      "the top-5 localization error is 14.4%."
+    ],
+    "source_chunk": "C79"
+  },
+  {
+    "id": "resnet_q11",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "How many FLOPs does the VGG-19 model have?",
+    "gold_snippets": [
+      "Left: the VGG-19 model [41] (19.6 billion FLOPs) as a reference."
+    ],
+    "source_chunk": "F2"
+  },
+  {
+    "id": "resnet_q12",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "Do residual networks have extra parameters compared to plain networks in the plot?",
+    "gold_snippets": [
+      "In this plot, the residual networks have no extra parameter compared to their plain counterparts."
+    ],
+    "source_chunk": "F4"
+  },
+  {
+    "id": "resnet_q13",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What figure presents a similar phenomenon to the CIFAR-10 training and test error results?",
+    "gold_snippets": [
+      "Similar phenomena on ImageNet is presented in Fig. 4."
+    ],
+    "source_chunk": "C3"
+  },
+  {
+    "id": "resnet_q14",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is a representation used in image recognition that encodes residual vectors with respect to a dictionary?",
+    "gold_snippets": [
+      "In image recognition, VLAD [18] is a representation that encodes by the residual vectors with respect to a dictionary, and Fisher Vector [30] can be formulated as a probabilistic version [18] of VLAD."
+    ],
+    "source_chunk": "C10"
+  },
+  {
+    "id": "resnet_q15",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "How many images are in the ImageNet 2012 validation set?",
+    "gold_snippets": [
+      "The models are trained on the 1.28 million training images, and evalu- ated on the 50k validation images."
+    ],
+    "source_chunk": "C26"
+  },
+  {
+    "id": "resnet_q16",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the top-1 error rate for a 34-layer plain ResNet on the ImageNet validation set according to Table 2?",
+    "gold_snippets": [
+      "plain ResNet 18 layers 27.94 27.88 34 layers 28.54 25.03 Table 2. Top-1 error (%, 10-crop testing) on ImageNet validation."
+    ],
+    "source_chunk": "C29"
+  },
+  {
+    "id": "resnet_q17",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is one method proposed to address vanishing or exploding gradients?",
+    "gold_snippets": [
+      "In [44, 24], a few interme- diate layers are directly connected to auxiliary classiﬁers for addressing vanishing/exploding gradients."
+    ],
+    "source_chunk": "C12"
+  },
+  {
+    "id": "resnet_q18",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the primary goal of the residual learning framework presented in this paper?",
+    "gold_snippets": [
+      "We present a residual learning framework to ease the training of networks that are substantially deeper than those used previously."
+    ],
+    "source_chunk": "C0"
+  },
+  {
+    "id": "resnet_q19",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the mini-batch size used for fine-tuning in this study?",
+    "gold_snippets": [
+      "We use a mini-batch size of 256 images for ﬁne-tuning."
+    ],
+    "source_chunk": "C77"
+  },
+  {
+    "id": "resnet_q20",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What does the analysis in Fig. 7 show regarding layer responses?",
+    "gold_snippets": [
+      "Fig. 7 shows the standard deviations (std) of the layer responses."
+    ],
+    "source_chunk": "C47"
+  },
+  {
+    "id": "resnet_q21",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What do the deep plain networks exhibit when they become deeper?",
+    "gold_snippets": [
+      "The deep plain nets suffer from increased depth, and exhibit higher training error when going deeper."
+    ],
+    "source_chunk": "C44"
+  },
+  {
+    "id": "resnet_q22",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What does the original function become when layers explicitly approximate a residual function F(x) := H(x) - x?",
+    "gold_snippets": [
+      "The original function thus becomes F(x)+x."
+    ],
+    "source_chunk": "C14"
+  },
+  {
+    "id": "resnet_q23",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What are the weight decay and momentum values used in the models?",
+    "gold_snippets": [
+      "We use a weight decay of 0.0001 and momentum of 0.9, and adopt the weight initialization in [13] and BN [16] but with no dropout."
+    ],
+    "source_chunk": "C43"
+  },
+  {
+    "id": "resnet_q24",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What was the single-model top-5 validation error of the 152-layer ResNet?",
+    "gold_snippets": [
+      "Our 152-layer ResNet has a single-model top-5 validation error of 4.49%."
+    ],
+    "source_chunk": "C40"
+  },
+  {
+    "id": "resnet_q25",
+    "type": "in_scope",
+    "index": "resnet",
+    "question": "What is the total number of weighted layers in Fig. 3 (middle)?",
+    "gold_snippets": [
+      "The total number of weighted layers is 34 in Fig. 3 (middle)."
+    ],
+    "source_chunk": "C20"
+  },
+  {
+    "id": "resnet_oos1",
+    "type": "out_of_scope",
+    "index": "resnet",
+    "question": "What is the capital of France?"
+  },
+  {
+    "id": "resnet_oos2",
+    "type": "out_of_scope",
+    "index": "resnet",
+    "question": "Who won the 2018 FIFA World Cup?"
+  },
+  {
+    "id": "resnet_oos3",
+    "type": "out_of_scope",
+    "index": "resnet",
+    "question": "What is the boiling point of water at sea level?"
+  },
+  {
+    "id": "resnet_oos4",
+    "type": "out_of_scope",
+    "index": "resnet",
+    "question": "How do I bake sourdough bread?"
+  }
+]

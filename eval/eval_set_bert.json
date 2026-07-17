@@ -1,0 +1,276 @@
+[
+  {
+    "id": "bert_q1",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How many NLP tasks did BERT advance the state of the art for?",
+    "gold_snippets": [
+      "BERT advances the state of the art for eleven NLP tasks."
+    ],
+    "source_chunk": "C7"
+  },
+  {
+    "id": "bert_q2",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Which column in Table 1 is calculated differently than the official GLUE score?",
+    "gold_snippets": [
+      "The “Average” column is slightly different than the ofﬁcial GLUE score, since we exclude the problematic WNLI set.8 BERT"
+    ],
+    "source_chunk": "C29"
+  },
+  {
+    "id": "bert_q3",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How is the average Dev Set accuracy reported in Table 6?",
+    "gold_snippets": [
+      "In this table, we report the average Dev Set accuracy from 5 random restarts of ﬁne-tuning."
+    ],
+    "source_chunk": "C44"
+  },
+  {
+    "id": "bert_q4",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Why can standard conditional language models only be trained left-to-right or right-to-left?",
+    "gold_snippets": [
+      "Unfortunately, standard conditional language models can only be trained left-to-right or right-to-left, since bidirec- tional conditioning would allow each word to i"
+    ],
+    "source_chunk": "C19"
+  },
+  {
+    "id": "bert_q5",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What is a key advantage of pre-training from unlabeled text and fine-tuning for downstream tasks?",
+    "gold_snippets": [
+      "The advantage of these approaches is that few parameters need to be learned from scratch."
+    ],
+    "source_chunk": "C11"
+  },
+  {
+    "id": "bert_q6",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What is QNLI Question Natural Language Inference?",
+    "gold_snippets": [
+      "Question Natural Language Inference is a version of the Stanford Question Answering Dataset (Rajpurkar et al., 2016) which has been converted to a binary classiﬁcation task (Wang et al., 2018a)."
+    ],
+    "source_chunk": "C80"
+  },
+  {
+    "id": "bert_q7",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What is the definition of the 'No NSP' model?",
+    "gold_snippets": [
+      "No NSP: A bidirectional model which is trained using the “masked LM” (MLM) but without the “next sentence prediction” (NSP) task."
+    ],
+    "source_chunk": "C41"
+  },
+  {
+    "id": "bert_q8",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Who is the author of the 2018 paper 'An efficient framework for learning sentence representations'?",
+    "gold_snippets": [
+      "eswaran and Honglak Lee. 2018. An efﬁcient framework for learning sentence represen- tations."
+    ],
+    "source_chunk": "C59"
+  },
+  {
+    "id": "bert_q9",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Which task is BERT applied to in this section?",
+    "gold_snippets": [
+      "In this section, we compare the two approaches by applying BERT to the CoNLL-2003 Named Entity Recognition (NER) task (Tjong Kim Sang and De Meulder, 2003)."
+    ],
+    "source_chunk": "C48"
+  },
+  {
+    "id": "bert_q10",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Does MLM converge faster or slower than a left-to-right model?",
+    "gold_snippets": [
+      "ate that MLM does converge marginally slower than a left- to-right model (which predicts every token), but the empirical improvements of the MLM model far outweigh the increased training cost."
+    ],
+    "source_chunk": "C71"
+  },
+  {
+    "id": "bert_q11",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What does the feature-based approach do during fine-tuning?",
+    "gold_snippets": [
+      "To ablate the ﬁne-tuning approach, we apply the feature-based approach by extracting the activa- tions from one or more layers without ﬁne-tuning any parameters of BERT."
+    ],
+    "source_chunk": "C50"
+  },
+  {
+    "id": "bert_q12",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How are sentences in the Benchmark annotated?",
+    "gold_snippets": [
+      "They were annotated with a score from 1 to 5 denoting how similar the two sentences are in terms of semantic meaning."
+    ],
+    "source_chunk": "C82"
+  },
+  {
+    "id": "bert_q13",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How does the single BERT model compare to the top ensemble system in terms of F1 score?",
+    "gold_snippets": [
+      "In fact, our single BERT model outperforms the top ensemble sys- tem in terms of F1 score."
+    ],
+    "source_chunk": "C34"
+  },
+  {
+    "id": "bert_q14",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Does BERT use a single or mixed strategy for masking target tokens during pre-training?",
+    "gold_snippets": [
+      "In Section 3.1, we mention that BERT uses a mixed strategy for masking the target tokens when pre-training with the masked language model (MLM) objective."
+    ],
+    "source_chunk": "C85"
+  },
+  {
+    "id": "bert_q15",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How does BERT's pre-training differ from Radford et al. (2018)?",
+    "gold_snippets": [
+      "Un- like Radford et al. (2018), which uses unidirec- tional language models for pre-training, BERT uses masked language models to enable pre- trained deep bidirectional representations."
+    ],
+    "source_chunk": "C6"
+  },
+  {
+    "id": "bert_q16",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What does the TriviaQA dataset consist of?",
+    "gold_snippets": [
+      "The TriviaQA data we used consists of paragraphs from TriviaQA-Wiki formed of the ﬁrst 400 tokens in documents, that contain at least one of the provided possible answers."
+    ],
+    "source_chunk": "C37"
+  },
+  {
+    "id": "bert_q17",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Why is a single bidirectional model more efficient than training separate LTR and RTL models?",
+    "gold_snippets": [
+      "(a) this is twice as expensive as a single bidirectional model; (b) this is non-intuitive for tasks like QA, since the RTL model would not be able to condition the answer on the question; (c) this it is strictly less powerful than a deep bidirectional model, since it can use both left and right context at every layer."
+    ],
+    "source_chunk": "C43"
+  },
+  {
+    "id": "bert_q18",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "How beneficial is pre-training towards the NSP task?",
+    "gold_snippets": [
+      "Despite its simplicity, we demon- strate in Section 5.1 that pre-training towards this task is very beneﬁcial to both QA and NLI."
+    ],
+    "source_chunk": "C23"
+  },
+  {
+    "id": "bert_q19",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What was the size of the BooksCorpus used for pre-training?",
+    "gold_snippets": [
+      "For the pre-training corpus we use the BooksCorpus (800M words) (Zhu et al., 2015) an"
+    ],
+    "source_chunk": "C24"
+  },
+  {
+    "id": "bert_q20",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Are large datasets more or less sensitive to hyperparameter choice than small datasets?",
+    "gold_snippets": [
+      "We also observed that large data sets (e.g., 100k+ labeled training examples) were far less sensitive to hyperparameter choice than small data sets."
+    ],
+    "source_chunk": "C75"
+  },
+  {
+    "id": "bert_q21",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What dropout probability was used for training BERT?",
+    "gold_snippets": [
+      "We use a dropout prob- ability of 0.1 on all layers."
+    ],
+    "source_chunk": "C73"
+  },
+  {
+    "id": "bert_q22",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Does BERTBASE achieve higher accuracy on MNLI when trained for 1M steps versus 500k steps?",
+    "gold_snippets": [
+      "Yes, BERTBASE achieves almost 1.0% additional accuracy on MNLI when trained on 1M steps compared to 500k steps."
+    ],
+    "source_chunk": "C84"
+  },
+  {
+    "id": "bert_q23",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "Where was the 11th International Workshop on Semantic Evaluation held?",
+    "gold_snippets": [
+      "f the 11th International Workshop on Semantic Evaluation (SemEval-2017), pages 1–14, Vancou- ver, Canada."
+    ],
+    "source_chunk": "C54"
+  },
+  {
+    "id": "bert_q24",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What did Melamud et al. (2016) propose for learning contextual representations?",
+    "gold_snippets": [
+      "Melamud et al. (2016) proposed learning contextual representations through a task to pre- dict a single word from both left and right context using LSTMs."
+    ],
+    "source_chunk": "C10"
+  },
+  {
+    "id": "bert_q25",
+    "type": "in_scope",
+    "index": "bert",
+    "question": "What is the goal of natural language inference and paraphrasing tasks?",
+    "gold_snippets": [
+      "These include sentence-level tasks such as natural language inference (Bowman et al., 2015; Williams et al., 2018) and paraphrasing (Dolan and Brockett, 2005), which aim to predict the re- lationships between sentences by analyzing them holistically"
+    ],
+    "source_chunk": "C2"
+  },
+  {
+    "id": "bert_oos1",
+    "type": "out_of_scope",
+    "index": "bert",
+    "question": "What is the capital of France?"
+  },
+  {
+    "id": "bert_oos2",
+    "type": "out_of_scope",
+    "index": "bert",
+    "question": "Who won the 2018 FIFA World Cup?"
+  },
+  {
+    "id": "bert_oos3",
+    "type": "out_of_scope",
+    "index": "bert",
+    "question": "What is the boiling point of water at sea level?"
+  },
+  {
+    "id": "bert_oos4",
+    "type": "out_of_scope",
+    "index": "bert",
+    "question": "How do I bake sourdough bread?"
+  }
+]

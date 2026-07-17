@@ -1,0 +1,276 @@
+[
+  {
+    "id": "vgg_q1",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "By how much did the result exceed the previous best result of Chatfield et al. (2014)?",
+    "gold_snippets": [
+      "the previous best result of Chatﬁeld et al. (2014) by more than 6%."
+    ],
+    "source_chunk": "C69"
+  },
+  {
+    "id": "vgg_q2",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What was the ILSVRC test error for the ensemble of 7 networks?",
+    "gold_snippets": [
+      "The resulting ensemble of 7 networks has 7.3% ILSVRC test error."
+    ],
+    "source_chunk": "C38"
+  },
+  {
+    "id": "vgg_q3",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What did the best-performing submissions to ILSVRC-2013 utilize regarding the first convolutional layer?",
+    "gold_snippets": [
+      "For instance, the best-performing submissions to the ILSVRC- 2013 (Zeiler & Fergus, 2013; Sermanet et al., 2014) utilised smaller receptive window size and smaller stride of the ﬁrst convolutional layer."
+    ],
+    "source_chunk": "C3"
+  },
+  {
+    "id": "vgg_q4",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What is the dimension of the image descriptor produced by global average pooling on the resulting feature map?",
+    "gold_snippets": [
+      "We then perform global average pooling on the resulting feature map, which produces a 4096-D image descriptor."
+    ],
+    "source_chunk": "C64"
+  },
+  {
+    "id": "vgg_q5",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "Is jittering helpful for capturing multi-scale image statistics?",
+    "gold_snippets": [
+      "jittering is indeed helpful for capturing multi-scale image statistics."
+    ],
+    "source_chunk": "C33"
+  },
+  {
+    "id": "vgg_q6",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What did Girshick et al. (2014) replace the ConvNet of Krizhevsky et al. (2012) with to achieve state of the art object detection?",
+    "gold_snippets": [
+      "For instance, Girshick et al. (2014) achieve the state of the object detection results by replacing the ConvNet of Krizhevsky et al. (2012) with our 16"
+    ],
+    "source_chunk": "C74"
+  },
+  {
+    "id": "vgg_q7",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How is Multi-GPU training carried out?",
+    "gold_snippets": [
+      "Multi-GPU training exploits data parallelism, and is carried out by splitting each batch of training images into several GPU batches, processed in parallel on each GPU."
+    ],
+    "source_chunk": "C27"
+  },
+  {
+    "id": "vgg_q8",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "In which section are the configurations compared on the ILSVRC classification task?",
+    "gold_snippets": [
+      "The details of the image classiﬁcation training and evaluation are then presented in Sect. 3, and the ∗current afﬁliation: Google DeepMind +current afﬁliation: University of Oxford and Google DeepMind 1http://www.robots.ox.ac.uk/˜vgg/research/very_deep/ 1 Published as a conference paper at ICLR 2015 conﬁgurations are compared on the ILSVRC classiﬁcation task in Sect. 4."
+    ],
+    "source_chunk": "C5"
+  },
+  {
+    "id": "vgg_q9",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What is the size of the filters used in the convolution layers to capture left/right, up/down, and center notions?",
+    "gold_snippets": [
+      "(conv.) layers, where we use ﬁlters with a very small receptive ﬁeld: 3 × 3 (which is the smallest size to capture the notion of left/right, up/down, center)."
+    ],
+    "source_chunk": "C7"
+  },
+  {
+    "id": "vgg_q10",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What was demonstrated regarding representation depth and classification accuracy?",
+    "gold_snippets": [
+      "It was demonstrated that the representation depth is beneﬁcial for the classiﬁcation accuracy, and that state-of-the-art performance on the ImageNet challenge dataset can be achieved using a conventional ConvNet architecture"
+    ],
+    "source_chunk": "C43"
+  },
+  {
+    "id": "vgg_q11",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How much speedup does the authors' scheme provide on an off-the-shelf 4-GPU system compared to a single GPU?",
+    "gold_snippets": [
+      "we have found that our conceptually much simpler scheme already provides a speedup of 3.75 times on an off-the-shelf 4-GPU system, as compared to using a single GPU."
+    ],
+    "source_chunk": "C28"
+  },
+  {
+    "id": "vgg_q12",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What is the pre-training configuration for the single-scale model used for multi-scale models?",
+    "gold_snippets": [
+      "For speed reasons, we trained multi-scale models by ﬁne-tuning all layers of a single-scale model with the same conﬁguration, pre-trained with ﬁxed S = 384."
+    ],
+    "source_chunk": "C23"
+  },
+  {
+    "id": "vgg_q13",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How many classes does the dataset used for ILSVRC 2012–2014 challenges include?",
+    "gold_snippets": [
+      "The dataset includes images of 1000 classes, and is split into three sets: training (1.3M images), validation (50K images), and testing (100K images with held-out class labels)."
+    ],
+    "source_chunk": "C29"
+  },
+  {
+    "id": "vgg_q14",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What is the input size for the ConvNet configurations?",
+    "gold_snippets": [
+      "input (224 × 224 RGB image)"
+    ],
+    "source_chunk": "C12"
+  },
+  {
+    "id": "vgg_q15",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What do the asterisks in the results denote?",
+    "gold_snippets": [
+      "Results marked with * were achieved using ConvNets pre-trained on the extended ILSVRC dataset (1512 classes)."
+    ],
+    "source_chunk": "C75"
+  },
+  {
+    "id": "vgg_q16",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What is the main objective of the research presented in this paper?",
+    "gold_snippets": [
+      "In this work we investigate the effect of the convolutional network depth on its accuracy in the large-scale image recognition setting."
+    ],
+    "source_chunk": "C0"
+  },
+  {
+    "id": "vgg_q17",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What was the mAP for Zeiler & Fergus (Zeiler & Fergus, 2013) using 1 net?",
+    "gold_snippets": [
+      "Zeiler & Fergus (Zeiler & Fergus, 2013) (1 net) 37.5 16.0 16.1"
+    ],
+    "source_chunk": "C42"
+  },
+  {
+    "id": "vgg_q18",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "What was the test error achieved using an ensemble of 7 models?",
+    "gold_snippets": [
+      "23.7 6.8 6.8 7.3% test error using an ensemble of 7 models."
+    ],
+    "source_chunk": "C40"
+  },
+  {
+    "id": "vgg_q19",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "In the \"Network in Network\" architecture of Lin et al. (2014), what were 1×1 conv. layers utilized as?",
+    "gold_snippets": [
+      "It should be noted that 1×1 conv. layers have recently been utilised in the “Network in Network” architecture of Lin et al. (2014)."
+    ],
+    "source_chunk": "C15"
+  },
+  {
+    "id": "vgg_q20",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How is the multinomial logistic regression objective optimized during ConvNet training?",
+    "gold_snippets": [
+      "Namely, the training is carried out by optimising the multinomial logistic regression objective using mini-batch gradient descent (based on back-propagation (LeCun et al., 1989)) with"
+    ],
+    "source_chunk": "C17"
+  },
+  {
+    "id": "vgg_q21",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How is the average recognition performance measured for the datasets mentioned?",
+    "gold_snippets": [
+      "A standard eval- uation protocol on these datasets is to generate several random splits into training and test data and report the average recognition performance across the splits, which is measured by the mean class recall"
+    ],
+    "source_chunk": "C70"
+  },
+  {
+    "id": "vgg_q22",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How were the fixed-size 224x224 ConvNet input images obtained?",
+    "gold_snippets": [
+      "To obtain the ﬁxed-size 224×224 ConvNet input images, they were randomly cropped from rescaled training images (one crop per image per SGD iteration)."
+    ],
+    "source_chunk": "C20"
+  },
+  {
+    "id": "vgg_q23",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "In Table 5, what is compared against dense ConvNet evaluation?",
+    "gold_snippets": [
+      "In Table 5 we compare dense ConvNet evaluation with mult-crop evaluation (see Sect. 3.2 for de- tails)."
+    ],
+    "source_chunk": "C36"
+  },
+  {
+    "id": "vgg_q24",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How many channels does the network start with in the first layer?",
+    "gold_snippets": [
+      "channels) is rather small, starting from 64 in the ﬁrst layer and then increasing by a factor of 2 after each max-pooling layer, until it reaches 512."
+    ],
+    "source_chunk": "C10"
+  },
+  {
+    "id": "vgg_q25",
+    "type": "in_scope",
+    "index": "vgg",
+    "question": "How are pre-trained ILSVRC ConvNets utilized for image classification on other datasets?",
+    "gold_snippets": [
+      "To utilise the ConvNets, pre-trained on ILSVRC, for image classiﬁcation on other datasets, we remove the last fully-connected layer (which performs 1000-way ILSVRC classiﬁcation), and use 4096-D activations of the penultimate layer as image features, which are aggregated across multiple locations and scales."
+    ],
+    "source_chunk": "C63"
+  },
+  {
+    "id": "vgg_oos1",
+    "type": "out_of_scope",
+    "index": "vgg",
+    "question": "What is the capital of France?"
+  },
+  {
+    "id": "vgg_oos2",
+    "type": "out_of_scope",
+    "index": "vgg",
+    "question": "Who won the 2018 FIFA World Cup?"
+  },
+  {
+    "id": "vgg_oos3",
+    "type": "out_of_scope",
+    "index": "vgg",
+    "question": "What is the boiling point of water at sea level?"
+  },
+  {
+    "id": "vgg_oos4",
+    "type": "out_of_scope",
+    "index": "vgg",
+    "question": "How do I bake sourdough bread?"
+  }
+]

@@ -1,0 +1,276 @@
+[
+  {
+    "id": "transformer_q1",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What new architecture is proposed that relies solely on attention mechanisms?",
+    "gold_snippets": [
+      "We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely."
+    ],
+    "source_chunk": "C1"
+  },
+  {
+    "id": "transformer_q2",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is a potential side benefit of using self-attention?",
+    "gold_snippets": [
+      "As side benefit, self-attention could yield more interpretable models."
+    ],
+    "source_chunk": "C27"
+  },
+  {
+    "id": "transformer_q3",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "Which development set was used in the experiments?",
+    "gold_snippets": [
+      "development set, newstest2013."
+    ],
+    "source_chunk": "C35"
+  },
+  {
+    "id": "transformer_q4",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What permission does Google grant regarding the paper's tables and figures?",
+    "gold_snippets": [
+      "Provided proper attribution is provided, Google hereby grants permission to reproduce the tables and figures in this paper solely for use in journalistic or scholarly works."
+    ],
+    "source_chunk": "C0"
+  },
+  {
+    "id": "transformer_q5",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "Why might a sinusoidal positional encoding be used?",
+    "gold_snippets": [
+      "oidal version because it may allow the model to extrapolate to sequence lengths longer than the ones encountered during training."
+    ],
+    "source_chunk": "C23"
+  },
+  {
+    "id": "transformer_q6",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "On what task was the Transformer tested to evaluate generalization to other tasks?",
+    "gold_snippets": [
+      "To evaluate if the Transformer can generalize to other tasks we performed experiments on English constituency parsing."
+    ],
+    "source_chunk": "C37"
+  },
+  {
+    "id": "transformer_q7",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "Why is dot-product attention more efficient in practice than additive attention?",
+    "gold_snippets": [
+      "While the two are similar in theoretical complexity, dot-product attention is much faster and more space-efficient in practice, since it can be implemented using highly optimized matrix multiplication code."
+    ],
+    "source_chunk": "C14"
+  },
+  {
+    "id": "transformer_q8",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "How can an attention function be described?",
+    "gold_snippets": [
+      "An attention function can be described as mapping a query and a set of key-value pairs to an output, where the query, keys, values, and output are all vectors."
+    ],
+    "source_chunk": "C12"
+  },
+  {
+    "id": "transformer_q9",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "How does the number of operations required to relate signals from two arbitrary positions grow for ConvS2S and ByteNet?",
+    "gold_snippets": [
+      "In these models, the number of operations required to relate signals from two arbitrary input or output positions grows in the distance between positions, linearly for ConvS2S and logarithmically for ByteNet."
+    ],
+    "source_chunk": "C7"
+  },
+  {
+    "id": "transformer_q10",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "In which layer of the model are the two attention heads involved in anaphora resolution?",
+    "gold_snippets": [
+      "Two attention heads, also in layer 5 of 6, apparently involved in anaphora resolution."
+    ],
+    "source_chunk": "F7"
+  },
+  {
+    "id": "transformer_q11",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "On which English-to-German translation development set are all the metrics in Table 3 reported?",
+    "gold_snippets": [
+      "All metrics are on the English-to-German translation development set, newstest2013."
+    ],
+    "source_chunk": "F4"
+  },
+  {
+    "id": "transformer_q12",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "Which TFLOPS values were used for the K80, K40, M40, and P100 GPUs respectively?",
+    "gold_snippets": [
+      "We used values of 2.8, 3.7, 6.0 and 9.5 TFLOPS for K80, K40, M40 and P100, respectively."
+    ],
+    "source_chunk": "C34"
+  },
+  {
+    "id": "transformer_q13",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "Why must positional encodings be added to the input embeddings in this model?",
+    "gold_snippets": [
+      "Since our model contains no recurrence and no convolution, in order for the model to make use of the order of the sequence, we must inject some information about the relative or absolute position of the tokens in the sequence."
+    ],
+    "source_chunk": "C21"
+  },
+  {
+    "id": "transformer_q14",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is the primary drawback of the inherently sequential nature of input for position t?",
+    "gold_snippets": [
+      "This inherently sequential nature precludes parallelization within training examples, which becomes critical at longer sequence lengths, as memory constraints limit batching across examples."
+    ],
+    "source_chunk": "C5"
+  },
+  {
+    "id": "transformer_q15",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "How does the Transformer architecture differ from traditional attention mechanisms in terms of recurrence?",
+    "gold_snippets": [
+      "In this work we propose the Transformer, a model architecture eschewing recurrence and instead relying entirely on an attention mechanism to draw global dependencies between input and output."
+    ],
+    "source_chunk": "C6"
+  },
+  {
+    "id": "transformer_q16",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is the dimension of the outputs produced by the embedding layers and sub-layers?",
+    "gold_snippets": [
+      "To facilitate these residual connections, all sub-layers in the model, as well as the embedding layers, produce outputs of dimension dmodel = 512."
+    ],
+    "source_chunk": "C11"
+  },
+  {
+    "id": "transformer_q17",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What does the word 'aking' attend to in the encoder self-attention of layer 5 of 6?",
+    "gold_snippets": [
+      "Many of the attention heads attend to a distant dependency of the verb ‘making’, completing the phrase ‘making...more difficult’."
+    ],
+    "source_chunk": "F6"
+  },
+  {
+    "id": "transformer_q18",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is the general structure of most competitive neural sequence transduction models?",
+    "gold_snippets": [
+      "Most competitive neural sequence transduction models have an encoder-decoder structure [5, 2, 35]."
+    ],
+    "source_chunk": "C9"
+  },
+  {
+    "id": "transformer_q19",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What was the size of the shared source-target vocabulary for the byte-pair encoding used?",
+    "gold_snippets": [
+      "g byte-pair encoding [3], which has a shared source- target vocabulary of about 37000 tokens."
+    ],
+    "source_chunk": "C28"
+  },
+  {
+    "id": "transformer_q20",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "How does the performance of single-head attention compare to the best setting in terms of BLEU score?",
+    "gold_snippets": [
+      "While single-head attention is 0.9 BLEU worse than the best setting, quality also drops off with too many heads."
+    ],
+    "source_chunk": "C36"
+  },
+  {
+    "id": "transformer_q21",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "How does the Transformer use multi-head attention in encoder-decoder attention layers?",
+    "gold_snippets": [
+      "In \"encoder-decoder attention\" layers, the queries come from the previous decoder layer, and the memory keys and values come from the output of the encoder."
+    ],
+    "source_chunk": "C17"
+  },
+  {
+    "id": "transformer_q22",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is the score of the Transformer (4 layers) when using only the WSJ dataset in a discriminative setting?",
+    "gold_snippets": [
+      "91.7 Transformer (4 layers) WSJ only, discriminative"
+    ],
+    "source_chunk": "C39"
+  },
+  {
+    "id": "transformer_q23",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What vocabulary size was used for the semi-supervised setting?",
+    "gold_snippets": [
+      "We used a vocabulary of 16K tokens for the WSJ only setting and a vocabulary of 32K tokens for the semi-supervised setting."
+    ],
+    "source_chunk": "C38"
+  },
+  {
+    "id": "transformer_q24",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What were Niki's responsibilities in the original codebase and tensor2tensor?",
+    "gold_snippets": [
+      "Niki designed, implemented, tuned and evaluated countless model variants in our original codebase and tensor2tensor."
+    ],
+    "source_chunk": "C3"
+  },
+  {
+    "id": "transformer_q25",
+    "type": "in_scope",
+    "index": "transformer",
+    "question": "What is the observation regarding the behavior of many attention heads?",
+    "gold_snippets": [
+      "Many of the attention heads exhibit behaviour that seems related to the structure of the sentence."
+    ],
+    "source_chunk": "F8"
+  },
+  {
+    "id": "transformer_oos1",
+    "type": "out_of_scope",
+    "index": "transformer",
+    "question": "What is the capital of France?"
+  },
+  {
+    "id": "transformer_oos2",
+    "type": "out_of_scope",
+    "index": "transformer",
+    "question": "Who won the 2018 FIFA World Cup?"
+  },
+  {
+    "id": "transformer_oos3",
+    "type": "out_of_scope",
+    "index": "transformer",
+    "question": "What is the boiling point of water at sea level?"
+  },
+  {
+    "id": "transformer_oos4",
+    "type": "out_of_scope",
+    "index": "transformer",
+    "question": "How do I bake sourdough bread?"
+  }
+]

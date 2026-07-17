@@ -1,0 +1,16 @@
+# secrets -- never commit; .env holds OPENROUTER_API_KEY
+.env
+
+# env
+.venv/
+__pycache__/
+*.py[cod]
+
+# generated artifacts: all rebuildable from scripts, and large
+data/*.pdf
+index/
+models/
+train/
+
+# keep the folders themselves
+!data/.gitkeep

@@ -1,0 +1,276 @@
+[
+  {
+    "id": "imagenet_q1",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What specific features does ImageNet offer that distinguish it from other existing datasets?",
+    "gold_snippets": [
+      "ImageNet offers disambiguated la- bels (LabelDisam), clean annotations (Clean), a dense hierarchy (DenseHie), full resolution images (FullRes) and is publicly avail- able (PublicAvail)."
+    ],
+    "source_chunk": "C12"
+  },
+  {
+    "id": "imagenet_q2",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is the percentage of the WordNet synsets currently represented in ImageNet?",
+    "gold_snippets": [
+      "The current ImageNet constitutes ∼10% of the Word- Net synsets."
+    ],
+    "source_chunk": "C42"
+  },
+  {
+    "id": "imagenet_q3",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What technique can be used to recognize an object class by querying similar images in ImageNet?",
+    "gold_snippets": [
+      "Given an image containing an unknown object, we would like to recognize its object class by querying similar images in ImageNet."
+    ],
+    "source_chunk": "C28"
+  },
+  {
+    "id": "imagenet_q4",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How is the classification score for a query image calculated using a subtree of synsets?",
+    "gold_snippets": [
+      "The maximum of all the classiﬁer responses in this subtree becomes the classiﬁcation score of the query image."
+    ],
+    "source_chunk": "C35"
+  },
+  {
+    "id": "imagenet_q5",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What does the confidence score table for 'Cat' and 'Burmese cat' indicate regarding voter requirements?",
+    "gold_snippets": [
+      "More votes are needed to reach the same degree of conﬁdence for “Burmese cat” images."
+    ],
+    "source_chunk": "F7"
+  },
+  {
+    "id": "imagenet_q6",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "Does ImageNet provide segmentation annotations?",
+    "gold_snippets": [
+      "ImageNet currently does not provide segmen- tation annotations."
+    ],
+    "source_chunk": "F4"
+  },
+  {
+    "id": "imagenet_q7",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How is precision calculated in the context of segmentation?",
+    "gold_snippets": [
+      "Precision is calculated by dividing the area of correctly segmented pixels by the area of detected pixels."
+    ],
+    "source_chunk": "F10"
+  },
+  {
+    "id": "imagenet_q8",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "For what types of applications can ImageNet serve as a useful resource?",
+    "gold_snippets": [
+      "Our goal is to show that ImageNet can serve as a useful resource for visual recognition applications such as object recognition, image classiﬁcation and object localization."
+    ],
+    "source_chunk": "C5"
+  },
+  {
+    "id": "imagenet_q9",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What percentage of synsets have more than 500 images in ImageNet?",
+    "gold_snippets": [
+      "Over 50% synsets have more than 500 images."
+    ],
+    "source_chunk": "C7"
+  },
+  {
+    "id": "imagenet_q10",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "Which online platform is used to verify candidate images via human annotation?",
+    "gold_snippets": [
+      "This is achieved by using the service of Amazon Mechanical Turk (AMT), an online platform on which one can put up tasks for users to complete and to get paid."
+    ],
+    "source_chunk": "C23"
+  },
+  {
+    "id": "imagenet_q11",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What emergent features are seen in the 'tusker' category through k-means clustering?",
+    "gold_snippets": [
+      "Different view- points and poses emerge in the “tusker” category."
+    ],
+    "source_chunk": "F12"
+  },
+  {
+    "id": "imagenet_q12",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What does the ROC curve for 'elk' and 'killer-whale' represent in the context of the experiment?",
+    "gold_snippets": [
+      "The ROC curve for “elk” and “killer-whale”."
+    ],
+    "source_chunk": "F8"
+  },
+  {
+    "id": "imagenet_q13",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is the unique connection between ImageNet and WordNet?",
+    "gold_snippets": [
+      "Because ImageNet is uniquely linked to all concrete nouns of WordNet whose synsets are richly interco"
+    ],
+    "source_chunk": "C45"
+  },
+  {
+    "id": "imagenet_q14",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "Why might precision values be low in the bounding box annotation experiment?",
+    "gold_snippets": [
+      "Note that precision is low due to extreme variability of the objects and because of small objects which have hardly any salient regions."
+    ],
+    "source_chunk": "C40"
+  },
+  {
+    "id": "imagenet_q15",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is the main objective of the research paper involving ImageNet?",
+    "gold_snippets": [
+      "The explosion of image data on the Internet has the po- tential to foster more sophisticated and robust models and algorithms to index, retrieve, organize and interact with im- ages and multimedia data."
+    ],
+    "source_chunk": "C0"
+  },
+  {
+    "id": "imagenet_q16",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How many synsets and images does the current version of ImageNet contain?",
+    "gold_snippets": [
+      "This paper offers a detailed analysis of ImageNet in its current state: 12 subtrees with 5247 synsets and 3.2 million images in total."
+    ],
+    "source_chunk": "C1"
+  },
+  {
+    "id": "imagenet_q17",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "Which model is used to learn the visual representation of objects against a global background class?",
+    "gold_snippets": [
+      "We use the non-parametric graphical model described in [14] to learn the visual representation of objects against a global background class."
+    ],
+    "source_chunk": "C39"
+  },
+  {
+    "id": "imagenet_q18",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is one proposed application of ImageNet for the computer vision community?",
+    "gold_snippets": [
+      "A training resource."
+    ],
+    "source_chunk": "C44"
+  },
+  {
+    "id": "imagenet_q19",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How does the number of categories in ImageNet compare to existing datasets?",
+    "gold_snippets": [
+      "The current ImageNet offers 20× the number of categories, and 100× the number of"
+    ],
+    "source_chunk": "C14"
+  },
+  {
+    "id": "imagenet_q20",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What percentage of synsets have very few images?",
+    "gold_snippets": [
+      "About 20% of the synsets have very few images."
+    ],
+    "source_chunk": "F1"
+  },
+  {
+    "id": "imagenet_q21",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is the negative set used in the classification performance experiments?",
+    "gold_snippets": [
+      "For each category, the negative set consists of all images from the other 15 categories."
+    ],
+    "source_chunk": "C29"
+  },
+  {
+    "id": "imagenet_q22",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How does the distribution of labels in ImageNet compare to other datasets like ESP?",
+    "gold_snippets": [
+      "ImageNet demonstrates a much more balanced distribu- tion, offering substantially more labels at deeper tree depth levels."
+    ],
+    "source_chunk": "C20"
+  },
+  {
+    "id": "imagenet_q23",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How is a common negative image set formed for training?",
+    "gold_snippets": [
+      "We form a common neg- ative image set by aggregating 10 images randomly sam- pled from each synset."
+    ],
+    "source_chunk": "C36"
+  },
+  {
+    "id": "imagenet_q24",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "How many dog categories does ImageNet offer, according to the text?",
+    "gold_snippets": [
+      "For example, to our knowledge no existing vision dataset offers images of 147 dog categories."
+    ],
+    "source_chunk": "C10"
+  },
+  {
+    "id": "imagenet_q25",
+    "type": "in_scope",
+    "index": "imagenet",
+    "question": "What is the average precision achieved for the synsets in the study?",
+    "gold_snippets": [
+      "An average of 99.7% precision is achieved for each synse"
+    ],
+    "source_chunk": "C11"
+  },
+  {
+    "id": "imagenet_oos1",
+    "type": "out_of_scope",
+    "index": "imagenet",
+    "question": "What is the capital of France?"
+  },
+  {
+    "id": "imagenet_oos2",
+    "type": "out_of_scope",
+    "index": "imagenet",
+    "question": "Who won the 2018 FIFA World Cup?"
+  },
+  {
+    "id": "imagenet_oos3",
+    "type": "out_of_scope",
+    "index": "imagenet",
+    "question": "What is the boiling point of water at sea level?"
+  },
+  {
+    "id": "imagenet_oos4",
+    "type": "out_of_scope",
+    "index": "imagenet",
+    "question": "How do I bake sourdough bread?"
+  }
+]

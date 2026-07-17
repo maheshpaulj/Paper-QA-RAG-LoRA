@@ -1,0 +1,23 @@
+[
+  {
+    "id": "q1",
+    "question": "What dataset was used to train the model?",
+    "type": "in_scope",
+    "gold_snippets": ["ImageNet"],
+    "gold_answer": "The model was trained on ImageNet."
+  },
+  {
+    "id": "q2",
+    "question": "What evaluation metric did the authors report?",
+    "type": "in_scope",
+    "gold_snippets": ["top-1 accuracy", "top-5"],
+    "gold_answer": "They report top-1 and top-5 accuracy."
+  },
+  {
+    "id": "q3",
+    "question": "What is the capital of France?",
+    "type": "out_of_scope",
+    "gold_snippets": [],
+    "gold_answer": "The paper does not address this."
+  }
+]
