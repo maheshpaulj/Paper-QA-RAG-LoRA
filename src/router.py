@@ -11,32 +11,16 @@ The router spots these and sends them down a direct path instead of top-k search
 """
 import re
 
-# Canonical section labels match how ingest.py Title-cases them.
-SECTION_ALIASES = {
-    "abstract": "Abstract",
-    "introduction": "Introduction",
-    "intro": "Introduction",
-    "background": "Background",
-    "related work": "Related Work",
-    "method": "Method",
-    "methods": "Method",
-    "methodology": "Method",
-    "approach": "Approach",
-    "experiment": "Experiment",
-    "experiments": "Experiment",
-    "result": "Result",
-    "results": "Result",
-    "evaluation": "Evaluation",
-    "discussion": "Discussion",
-    "conclusion": "Conclusion",
-    "conclusions": "Conclusion",
-    "references": "References",
-}
+# Shared with ingest so a query's section name always matches the tag on disk.
+from src.sections import canonical
 
 METADATA_RE = re.compile(
     r"\b(how many pages|number of pages|page count|how long is (?:this|the)|"
     r"who (?:wrote|are the authors?|is the author)|author'?s? names?|"
-    r"what is the title|when was (?:it|this) published)\b",
+    r"what is the title|when was (?:it|this) published|"
+    # counting the bibliography -- a count is not retrievable from top-k chunks
+    r"how many (?:references|citations|papers are cited)|"
+    r"number of (?:references|citations))\b",
     re.IGNORECASE,
 )
 
@@ -78,7 +62,7 @@ def _named_section(query):
     q = _OF_PAPER_RE.sub("", q)
     q = _FILLER_RE.sub("", q)
     q = re.sub(r"\s+", " ", q).strip()
-    return SECTION_ALIASES.get(q)
+    return canonical(q)
 
 
 def route(query):

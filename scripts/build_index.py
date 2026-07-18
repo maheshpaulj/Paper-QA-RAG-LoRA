@@ -14,6 +14,9 @@ def main(pdf_path, name="paper"):
     print(f"Ingesting {pdf_path} ...")
     chunks = ingest_pdf(pdf_path)
     meta = extract_meta(pdf_path)
+    # Remember where this came from so rebuild_all can find it again without a
+    # hardcoded list -- a list silently skips any paper you add yourself.
+    meta["source_pdf"] = str(pdf_path).replace("\\", "/")
     figures = extract_figures(pdf_path, FIGURE_DIR / name)  # per-paper: ids restart at F0
     # figures ride in the same index; their caption text is what gets embedded
     all_chunks = chunks + figures

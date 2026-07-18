@@ -10,6 +10,7 @@ import re
 import fitz  # PyMuPDF
 
 from config import CHUNK_SIZE, CHUNK_OVERLAP, ROOT
+from src.sections import match_header
 
 # A real caption is "Figure 3: ...", "Figure 3. ..." or "Figure 1.1: ..." -- papers
 # disagree on all of it. ImageNet uses a colon, ResNet a period, GPT-3 numbers
@@ -27,15 +28,7 @@ MIN_FIG_SIDE = 40     # ignore slivers
 # collapses the crop to nothing and silently drops the figure.
 PROSE_LEN = 200
 
-# Heuristic: lines that look like a section header in a research paper.
-SECTION_RE = re.compile(
-    r"^\s*(?:\d+\.?\s+)?("
-    r"abstract|introduction|related work|background|method(?:s|ology)?|approach|"
-    r"experiment(?:s|al)?|result(?:s)?|evaluation|discussion|conclusion(?:s)?|"
-    r"references|appendix"
-    r")\b",
-    re.IGNORECASE,
-)
+# Section headers come from src/sections.py so tagging and routing can't drift.
 
 
 def extract_pages(pdf_path):
@@ -47,44 +40,62 @@ def extract_pages(pdf_path):
 
 
 def extract_meta(pdf_path):
-    """Document-level facts that aren't in any single chunk (page count, title)."""
+    """Document-level facts that live in no single chunk.
+
+    Authors are deliberately NOT guessed here. The embedded author field is
+    routinely absent, truncated or wrong (GPT-3's PDF names 2 of its ~31 authors,
+    and not the first), and an earlier line-scanning heuristic was no better.
+    The pipeline reads authors off the title page instead -- see
+    Retriever.front_matter. Only facts we can state exactly belong in here.
+    """
     doc = fitz.open(pdf_path)
     md = doc.metadata or {}
-
-    title = (md.get("title") or "").strip()
-    author = (md.get("author") or "").strip()
-
-    # Fallback: if no metadata, extract from first page (authors are 3-6 lines down)
-    if not author and doc.page_count > 0:
-        first_page = doc[0].get_text("text").split("\n")
-        # Heuristic: author blocks have multiple short lines with capitals/names
-        # Affiliations and dept strings are longer and contain "University", "Dept", etc.
-        author_lines = []
-        for line in first_page[2:8]:
-            line = line.strip()
-            if not line or line[0].isdigit():
-                continue
-            # Stop at common headers or institution markers
-            lower = line.lower()
-            if any(x in lower for x in ["abstract", "introduction", "arxiv", "university", "dept", "institute"]):
-                break
-            # Author lines: short (< 80 chars), have capitals, multiple words
-            if len(line) < 80 and sum(c.isupper() for c in line) >= 2 and " " in line:
-                author_lines.append(line)
-        author = ", ".join(author_lines[:2]) if author_lines else ""  # limit to 2 lines
-
+    text = "\n".join(page.get_text("text") for page in doc)
     meta = {
         "page_count": doc.page_count,
-        "title": title or "Untitled",
-        "author": author or "Author(s) not found in metadata",
+        "title": (md.get("title") or "").strip() or "Untitled",
+        "reference_count": count_references(text),  # None when not countable
     }
     doc.close()
     return meta
 
 
+REF_HEADER_RE = re.compile(r"^\s*(?:\d+\.?\s+)?(?:references|bibliography)\s*$", re.IGNORECASE | re.MULTILINE)
+REF_NUM_RE = re.compile(r"^\s*\[(\d{1,3})\]", re.MULTILINE)
+
+
+def count_references(text):
+    """Number of entries in the bibliography, or None if it can't be counted.
+
+    Only numeric-bracketed bibliographies ("[1] ... [40] ...") are counted, and
+    only when the numbers run contiguously from 1 -- then the highest number IS
+    the count, exactly.
+
+    Author-year lists (BERT, VGG) and alphanumeric keys (GPT-3's "[ADG+16]") are
+    deliberately left uncounted. Heuristics for them were tried and were wrong by
+    a wide margin -- author-year undercounted 43 vs ~60, alpha keys overcounted
+    144 vs ~88 by sweeping up appendix citations. A confidently wrong number is
+    worse than admitting we can't count, so those return None and the pipeline
+    says so.
+    """
+    headers = list(REF_HEADER_RE.finditer(text))
+    if not headers:
+        return None
+    tail = text[headers[-1].end():]
+    nums = [int(n) for n in REF_NUM_RE.findall(tail)]
+    if not nums:
+        return None
+    highest = max(nums)
+    found = len(set(nums) & set(range(1, highest + 1)))
+    # contiguous enough that the highest label is the entry count
+    if highest >= 5 and found >= 0.8 * highest:
+        return highest
+    return None
+
+
 def _guess_section(line, current):
-    m = SECTION_RE.match(line.strip())
-    return m.group(1).title() if m else current
+    # canonical, not the literal header text -- "Results"/"Result" are one section
+    return match_header(line) or current
 
 
 def chunk_pages(pages):

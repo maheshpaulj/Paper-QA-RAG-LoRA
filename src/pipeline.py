@@ -59,10 +59,20 @@ class RAGPipeline:
         authors, and not the first one. The title page is authoritative, so
         author/title always go to the text.
         """
+        meta = self.retriever.store.meta
         q = question.lower()
         if "page" in q or "how long" in q:
-            n = self.retriever.store.meta.get("page_count")
+            n = meta.get("page_count")
             return f"This paper is {n} pages long." if n else None
+        if "reference" in q or "citation" in q or "cited" in q:
+            n = meta.get("reference_count")
+            if n:
+                return f"This paper cites {n} references."
+            # Only numeric bibliographies are counted exactly (see
+            # ingest.count_references). Say so rather than guessing a number.
+            return ("This paper's bibliography isn't numbered, so I can't count "
+                    "the entries exactly. You can read the References section "
+                    "directly by asking for it.")
         return None
 
     @staticmethod

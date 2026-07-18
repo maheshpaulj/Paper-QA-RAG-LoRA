@@ -83,6 +83,20 @@ alone can't serve every kind of query:
 | `summary` | "summarize this paper" | needs abstract+intro+conclusion, not top-k |
 | `qa` | "how does self-attention work?" | the normal path |
 
+### Managing papers
+
+```bat
+:: what's built
+python -m scripts.remove_paper --list
+
+:: remove one (deletes its index + figures; the PDF in data\ stays)
+python -m scripts.remove_paper gpt3
+```
+
+Removing a paper that has an eval set is refused unless you pass `--force` —
+dropping one silently changes what `run_eval` measures and makes the README's
+before/after numbers non-reproducible.
+
 ### Chatting with a new paper
 
 Two commands, then refresh the page — the app lists every built index, so a new
@@ -553,6 +567,36 @@ generalisation, not memorisation. LoRA r=16 on `query/key/value`, ~1–2% of par
   **+10% alone but ~nothing on top of it**. Ship reranking first. LoRA earns its
   place only if you can't afford a cross-encoder at query time — where it's free
   (the cost is at index time) while reranking costs latency on every query.
+
+### Section tagging — three bugs behind one symptom
+"What are the limitations?" returned text from the wrong section on a paper that
+*has* a Limitations section. Three independent causes, each enough on its own:
+
+- **Tagging and routing kept separate lists.** `ingest` stored the literal header
+  text, so "Results" and "Result" became different sections while the router
+  looked up only one — silently missing the other's chunks. Worse, `Limitations`
+  was in neither list, so those chunks inherited the previous section. Both lists
+  now come from `src/sections.py`, so they cannot drift.
+- **Roman numerals weren't parsed.** IEEE papers number sections `VIII. LIMITATIONS`;
+  the regex only handled arabic numbering, so *no* header in such a paper matched
+  and every chunk inherited the first section. The roman part is deliberately
+  case-**sensitive**: matched case-insensitively, `[IVXLC]+` also matches ordinary
+  words, and "Civil results were mixed" parses as numeral "Civil" + section
+  "results".
+- **Prose was mistaken for headers.** Matching the section name alone meant the
+  sentence "conclusions are drawn." — sitting directly under `VIII. LIMITATIONS` —
+  registered as a Conclusion header and *overwrote it*. So the section was found
+  and then immediately clobbered. A header now has to look like one: name alone,
+  or an inline `Abstract—…`, or a short line whose remaining words are capitalised.
+
+**Counting references** is metadata, not retrieval — you cannot count a
+bibliography from the top-5 chunks. `ingest.count_references` counts entries at
+build time, but **only for numeric bibliographies** (`[1] … [40]`) and only when
+the numbers run contiguously, where the highest label *is* the count. Author-year
+lists and alphanumeric keys (`[ADG+16]`) return None and the app says it can't
+count them: the heuristics tried were wrong by a wide margin (43 vs ~60, and 144
+vs ~88 by sweeping up appendix citations), and a confidently wrong number is
+worse than admitting the limit.
 
 ### Phase 4 — the silent no-op
 - **The bug that would have faked the whole result:** `sentence-transformers` saves

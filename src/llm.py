@@ -26,14 +26,20 @@ def image_part(data, mime="image/png"):
     return {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{b64}"}}
 
 
-def _post(url, key, model, parts, timeout):
+def _post(url, key, model, parts, timeout, max_tokens):
     """One attempt. Returns (text, None), or (None, reason) if worth retrying.
     Raises on failures that retrying won't fix."""
     try:
         resp = requests.post(
             url,
             headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
-            json={"model": model, "messages": [{"role": "user", "content": parts}]},
+            json={
+                "model": model,
+                "messages": [{"role": "user", "content": parts}],
+                # Set explicitly: provider defaults are small and undocumented,
+                # and a silently truncated answer looks like a bad answer.
+                "max_tokens": max_tokens,
+            },
             timeout=timeout,
         )
     except requests.RequestException as e:
@@ -54,7 +60,7 @@ def _post(url, key, model, parts, timeout):
     return (data["choices"][0]["message"]["content"] or "").strip(), None
 
 
-def chat(parts, model=None, tries=3, timeout=180):
+def chat(parts, model=None, tries=3, timeout=180, max_tokens=1024):
     url, key, default_model, fallbacks = llm_endpoint()
     if not key:
         raise RuntimeError("No API key set for the active LLM provider -- see .env.example")
@@ -67,10 +73,13 @@ def chat(parts, model=None, tries=3, timeout=180):
     reasons = []
     for attempt in range(tries):
         for m in models:
-            text, reason = _post(url, key, m, parts, timeout)
+            text, reason = _post(url, key, m, parts, timeout, max_tokens)
             if text is not None:
                 return text
             reasons.append(reason)
         if attempt < tries - 1:
             time.sleep(min(60, 5 * 2 ** attempt))  # 5s, 10s
-    raise RuntimeError("All models rate-limited. Last: " + "; ".join(reasons[-3:]))
+    # Don't call this "rate-limited" -- ConnectionError and a 429 are very
+    # different problems and saying the wrong one sends you debugging the wrong
+    # thing. Report what actually happened.
+    raise RuntimeError("LLM request failed after retries: " + "; ".join(reasons[-3:]))
