@@ -1,7 +1,9 @@
 """Streamlit UI for the paper RAG pipeline."""
-import streamlit as st
-from pathlib import Path
+import json
 
+import streamlit as st
+
+from config import INDEX_DIR
 from src.pipeline import RAGPipeline
 
 st.set_page_config(page_title="Paper RAG", layout="wide")
@@ -10,14 +12,44 @@ st.markdown(
     "Ask questions about research papers. Uses semantic search, reranking, and multimodal retrieval."
 )
 
-# Available indices (papers)
-INDICES = {
-    "ImageNet": "imagenet",
-    "Attention Is All You Need (Transformer)": "transformer",
-    "ResNet": "resnet",
-    "VGG": "vgg",
-    "BERT": "bert",
+# Nicer labels for the papers shipped with the repo. Anything else falls back to
+# its index name, so a newly built paper shows up here without touching this file.
+KNOWN_TITLES = {
+    "imagenet": "ImageNet: A Large-Scale Hierarchical Image Database",
+    "transformer": "Attention Is All You Need (Transformer)",
+    "resnet": "Deep Residual Learning (ResNet)",
+    "vgg": "Very Deep Convolutional Networks (VGG)",
+    "bert": "BERT",
 }
+
+
+@st.cache_data
+def discover_indices():
+    """Every built index, newest first. Built by `scripts.build_index`."""
+    found = {}
+    for faiss_path in sorted(INDEX_DIR.glob("*.faiss"), key=lambda p: -p.stat().st_mtime):
+        name = faiss_path.stem
+        label = KNOWN_TITLES.get(name)
+        if not label:
+            # prefer the PDF's own title if ingest managed to pull one
+            meta_path = INDEX_DIR / f"{name}.meta.json"
+            if meta_path.exists():
+                title = (json.loads(meta_path.read_text(encoding="utf-8")).get("title") or "").strip()
+                label = title if title and title != "Untitled" else name
+            else:
+                label = name
+        found[f"{label}  ·  {name}"] = name
+    return found
+
+
+INDICES = discover_indices()
+if not INDICES:
+    st.error(
+        "No indices found. Build one first:\n\n"
+        "```\npython -m scripts.fetch_papers 1706.03762\n"
+        "python -m scripts.build_index data/1706.03762.pdf transformer\n```"
+    )
+    st.stop()
 
 # Session state
 if "rag" not in st.session_state:
@@ -71,23 +103,44 @@ if question:
                     from PIL import Image
 
                     img = Image.open(chunk["image_path"])
-                    st.image(img, use_column_width=True)
+                    st.image(img, use_container_width=True)
                 except Exception as e:
                     st.warning(f"Could not load image: {e}")
             st.write(chunk["text"][:500] + ("..." if len(chunk["text"]) > 500 else ""))
 
 st.sidebar.markdown("---")
+with st.sidebar.expander("➕ Add a new paper"):
+    st.markdown(
+        "Run these in the repo, then refresh this page — the paper appears in the "
+        "dropdown automatically.\n\n"
+        "**From arXiv** (use the id from the URL):\n"
+        "```\n"
+        "python -m scripts.fetch_papers 2005.14165\n"
+        "python -m scripts.build_index data/2005.14165.pdf gpt3\n"
+        "```\n"
+        "**Your own PDF** — drop it in `data/`, then:\n"
+        "```\n"
+        "python -m scripts.build_index data/mypaper.pdf mypaper\n"
+        "```\n"
+        "The last argument is the index name you'll see listed here."
+    )
+    if st.button("🔄 Refresh paper list"):
+        discover_indices.clear()
+        st.rerun()
+
 st.sidebar.markdown(
     """
 **How it works:**
 1. Semantic search (bi-encoder) finds candidates
 2. Cross-encoder reranks to top-5
-3. LLM generates answer from chunks
+3. LLM generates answer from the chunks
 
-**Route:**
-- **metadata**: direct lookup (title, authors, etc.)
-- **section**: retrieves a specific section
-- **summary**: whole-paper summary
-- **qa**: standard Q&A via semantic search
+**Routes:**
+- **metadata** — page count, from the PDF itself
+- **metadata+text** — authors/title read off the title page
+- **section** — pulls a named section directly
+- **figure** — "what does Figure 3 show" → that caption + image
+- **summary** — abstract + intro + conclusion
+- **qa** — semantic search (the normal path)
 """
 )

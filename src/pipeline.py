@@ -19,13 +19,27 @@ class RAGPipeline:
         kind, arg = route(question)
 
         if kind == "metadata":
-            return self._result(question, self._metadata_answer(question), [], "metadata")
+            answer = self._metadata_answer(question)
+            if answer:
+                return self._result(question, answer, [], "metadata")
+            # Not in the PDF's metadata -- but authors/title are printed on the
+            # title page, so read them out of the front matter instead of giving
+            # up. Only page count is metadata-only, and that path always answers.
+            chunks = self.retriever.front_matter()
+            return self._result(question, self.generator.answer(question, chunks),
+                                chunks, "metadata+text")
 
         if kind == "section":
             chunks = self.retriever.by_section(arg)
             if chunks:  # fall through to qa if the section wasn't tagged
                 return self._result(question, self.generator.answer(question, chunks),
                                     chunks, "section")
+
+        if kind == "figure":
+            chunks = self.retriever.by_figure(*arg)
+            if chunks:  # unknown number -> fall through to semantic search
+                return self._result(question, self.generator.answer(question, chunks),
+                                    chunks, "figure")
 
         if kind == "summary":
             chunks = self.retriever.summary_chunks()
@@ -36,18 +50,20 @@ class RAGPipeline:
         return self._result(question, self.generator.answer(question, chunks), chunks, "qa")
 
     def _metadata_answer(self, question):
-        meta = self.retriever.store.meta
+        """Answer from the PDF's embedded metadata, or None to read the paper's
+        own front matter instead.
+
+        Only page_count is trustworthy here -- PyMuPDF computes it. The author
+        and title fields are whatever the authoring tool wrote and are routinely
+        absent, truncated or plain wrong: GPT-3's PDF lists two of its ~31
+        authors, and not the first one. The title page is authoritative, so
+        author/title always go to the text.
+        """
         q = question.lower()
         if "page" in q or "how long" in q:
-            n = meta.get("page_count")
-            return f"This paper is {n} pages long." if n else "Page count is unavailable."
-        if "author" in q or "who wrote" in q:
-            a = meta.get("author")
-            return f"Author(s): {a}" if a else "The PDF does not embed author metadata."
-        if "title" in q:
-            t = meta.get("title")
-            return f"Title: {t}" if t else "The PDF does not embed a title in its metadata."
-        return "That document-level detail is unavailable."
+            n = self.retriever.store.meta.get("page_count")
+            return f"This paper is {n} pages long." if n else None
+        return None
 
     @staticmethod
     def _result(question, answer, chunks, route_name):

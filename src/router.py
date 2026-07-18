@@ -40,6 +40,13 @@ METADATA_RE = re.compile(
     re.IGNORECASE,
 )
 
+# "what does figure 3 show", "explain table 2.1". Semantic search matches on
+# topic, so a figure *number* doesn't pull its caption -- the number is a tiny
+# part of the caption's meaning. Route these straight to the caption instead.
+FIGURE_RE = re.compile(
+    r"\b(figure|fig\.?|table)\s*(\d+(?:\.\d+)*)\b", re.IGNORECASE
+)
+
 SUMMARY_RE = re.compile(
     r"\b(summar(?:y|ize|ise|isation|ization)|tl;?dr|overview|"
     r"what(?:'s| is) this paper about|"
@@ -80,6 +87,10 @@ def route(query):
     section = _named_section(query)
     if section:
         return "section", section
+    fig = FIGURE_RE.search(query)
+    if fig:
+        # ("figure", "1.1") -- kind and number, so the retriever can match the caption
+        return "figure", (fig.group(1).rstrip(".").lower(), fig.group(2))
     if SUMMARY_RE.search(query):
         return "summary", None
     return "qa", None

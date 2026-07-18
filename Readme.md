@@ -57,9 +57,41 @@ Five minutes total: create a Space, copy files, push. It's live.
 Features:
 - Pick a paper from the sidebar
 - Ask a question, get an answer with citations
-- See retrieved chunks (text + images)
-- View the route taken (metadata/section/summary/qa)
+- See retrieved chunks (text + figure images)
+- View the route taken
 - Reranking + LoRA + multimodal all work out of the box
+
+### Query routes
+
+The router (`src/router.py`) picks a path per question, because semantic search
+alone can't serve every kind of query:
+
+| Route | Example | Why not plain search |
+|-------|---------|----------------------|
+| `metadata` | "how many pages?" | not in the text at all |
+| `metadata+text` | "who are the authors?" | on the title page; PDF metadata is unreliable |
+| `section` | "what is the abstract?" | the word "abstract" doesn't appear in the abstract |
+| `figure` | "what does Figure 3 show?" | a figure *number* carries almost no topical meaning |
+| `summary` | "summarize this paper" | needs abstract+intro+conclusion, not top-k |
+| `qa` | "how does self-attention work?" | the normal path |
+
+### Chatting with a new paper
+
+Two commands, then refresh the page — the app lists every built index, so a new
+paper shows up on its own with no code change.
+
+```bat
+:: from arXiv (the id is in the URL: arxiv.org/abs/2005.14165)
+python -m scripts.fetch_papers 2005.14165
+python -m scripts.build_index data\2005.14165.pdf gpt3
+
+:: or your own PDF -- drop it in data\ first
+python -m scripts.build_index data\mypaper.pdf mypaper
+```
+
+The last argument is the index name shown in the dropdown. Building re-reads the
+PDF, chunks it, extracts figures and embeds everything — roughly 10–60s depending
+on length. Nothing else needs to be re-run: other papers are untouched.
 
 ### Eval corpus
 
@@ -363,11 +395,22 @@ What we actually learned running each phase — the interview-story material.
   plots. Meanwhile pages that do have XObjects carry 13–64 of them (fragments and
   logos). Rendering the page region above each caption gets the real figure in
   both cases; XObject extraction would have silently missed a third of them.
-- **Caption regex: papers disagree on punctuation.** ImageNet writes "Figure 3:",
-  ResNet writes "Figure 3." — a colon-only regex found 13 figures in ImageNet and
-  **0 in ResNet**. Matching `[.:]` *after the number* fixes it (ResNet 0 → 21) while
-  still rejecting in-text refs like "Fig. 9 illustrates ...", which have only a
-  space there. A rule tuned on one paper is not a rule.
+- **Caption regex: every new paper broke it a new way.** Three variants found so
+  far, each of which silently produced **zero figures** for its paper:
+
+  | Style | Example | Found in |
+  |-------|---------|----------|
+  | colon | `Figure 3: ...` | ImageNet, Transformer, VGG, BERT |
+  | period | `Figure 3. ...` | ResNet (**0 → 21** figures) |
+  | section-scoped | `Figure 1.1: ...` | GPT-3 (**0 → 41** figures) |
+
+  Final pattern: `\d+(?:\.\d+)*\s*[.:]\s`. The discriminator against in-text refs
+  ("Figure 1.2 illustrates …") is the **period/colon after the number** — a
+  reference has only a space there, so it's still correctly rejected.
+- The failure mode is what matters: a caption regex that matches nothing doesn't
+  error, it just quietly produces a text-only index. **A rule tuned on one paper
+  is not a rule** — and the only thing that ever caught it was indexing a paper
+  from a different publisher.
 - **The bug worth remembering:** the first cut clipped the crop at the nearest text
   block above the caption, and extracted only **2 of 13** figures. Figures are full
   of their own text — axis labels ("tree height"), subfigure markers ("(a) (b)"),

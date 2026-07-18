@@ -11,11 +11,15 @@ import fitz  # PyMuPDF
 
 from config import CHUNK_SIZE, CHUNK_OVERLAP, ROOT
 
-# A real caption is "Figure 3: ..." or "Figure 3. ..." -- papers use both styles
-# (ImageNet uses the colon, ResNet the period). Requiring a period/colon *after*
-# the number is what keeps out in-text references like "Fig. 9 illustrates ...",
-# which have nothing but a space there.
-FIG_CAPTION_RE = re.compile(r"^\s*(?:figure|fig\.?|table)\s*\.?\s*\d+\s*[.:]\s", re.IGNORECASE)
+# A real caption is "Figure 3: ...", "Figure 3. ..." or "Figure 1.1: ..." -- papers
+# disagree on all of it. ImageNet uses a colon, ResNet a period, GPT-3 numbers
+# figures per section ("Figure 1.1"). Each variant silently yielded ZERO figures
+# until a paper using it got indexed.
+# The discriminator against in-text references ("Figure 1.2 illustrates ...") is
+# the period/colon *after* the number -- a reference has only a space there.
+FIG_CAPTION_RE = re.compile(
+    r"^\s*(?:figure|fig\.?|table)\s*\.?\s*\d+(?:\.\d+)*\s*[.:]\s", re.IGNORECASE
+)
 MAX_FIG_HEIGHT = 400  # points to look above a caption
 MIN_FIG_SIDE = 40     # ignore slivers
 # Only prose paragraphs and other captions bound a figure. Figures are full of
@@ -46,10 +50,33 @@ def extract_meta(pdf_path):
     """Document-level facts that aren't in any single chunk (page count, title)."""
     doc = fitz.open(pdf_path)
     md = doc.metadata or {}
+
+    title = (md.get("title") or "").strip()
+    author = (md.get("author") or "").strip()
+
+    # Fallback: if no metadata, extract from first page (authors are 3-6 lines down)
+    if not author and doc.page_count > 0:
+        first_page = doc[0].get_text("text").split("\n")
+        # Heuristic: author blocks have multiple short lines with capitals/names
+        # Affiliations and dept strings are longer and contain "University", "Dept", etc.
+        author_lines = []
+        for line in first_page[2:8]:
+            line = line.strip()
+            if not line or line[0].isdigit():
+                continue
+            # Stop at common headers or institution markers
+            lower = line.lower()
+            if any(x in lower for x in ["abstract", "introduction", "arxiv", "university", "dept", "institute"]):
+                break
+            # Author lines: short (< 80 chars), have capitals, multiple words
+            if len(line) < 80 and sum(c.isupper() for c in line) >= 2 and " " in line:
+                author_lines.append(line)
+        author = ", ".join(author_lines[:2]) if author_lines else ""  # limit to 2 lines
+
     meta = {
         "page_count": doc.page_count,
-        "title": (md.get("title") or "").strip(),
-        "author": (md.get("author") or "").strip(),
+        "title": title or "Untitled",
+        "author": author or "Author(s) not found in metadata",
     }
     doc.close()
     return meta
