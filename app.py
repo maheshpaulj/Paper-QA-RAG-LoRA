@@ -1,12 +1,41 @@
-"""Streamlit UI for the paper RAG pipeline."""
+"""Streamlit UI for the paper RAG pipeline.
+
+Launch with `run_app.bat` (or `.venv\\Scripts\\python.exe -m streamlit run app.py`).
+A bare `streamlit run app.py` may pick up a *global* streamlit whose interpreter
+can't see this venv's packages -- see the import guard below.
+"""
 import json
+import sys
 
 import streamlit as st
 
-from config import INDEX_DIR
-from src.pipeline import RAGPipeline
-
 st.set_page_config(page_title="Paper RAG", layout="wide")
+
+
+def _missing_dep_message(exc):
+    """A missing dep here almost always means the wrong interpreter, not a
+    genuinely uninstalled package -- say so, and name the interpreter in use."""
+    dep = getattr(exc, "name", None) or str(exc)
+    return (
+        f"**Missing dependency: `{dep}`**\n\n"
+        f"Running under: `{sys.executable}`\n\n"
+        "If that is not this project's `.venv`, you are on the wrong interpreter — "
+        "start the app with **`run_app.bat`** rather than a bare "
+        "`streamlit run app.py`.\n\n"
+        "If it *is* the venv, install the dependencies:\n"
+        "```\n.venv\\Scripts\\python.exe -m pip install "
+        "-r requirements.txt -r requirements-app.txt\n```"
+    )
+
+
+# Deps like torchvision/peft are imported lazily when a model is built, so the
+# wrong interpreter usually survives this import and fails later -- guard both.
+try:
+    from config import INDEX_DIR
+    from src.pipeline import RAGPipeline
+except ImportError as e:
+    st.error(_missing_dep_message(e))
+    st.stop()
 st.title("📄 Research Paper RAG")
 st.markdown(
     "Ask questions about research papers. Uses semantic search, reranking, and multimodal retrieval."
@@ -62,10 +91,18 @@ st.sidebar.header("Select Paper")
 selected_paper = st.sidebar.selectbox("Paper", list(INDICES.keys()))
 index_name = INDICES[selected_paper]
 
-# Load RAG pipeline for selected paper
+# Load RAG pipeline for selected paper.
+# torchvision/peft are imported lazily by sentence-transformers when a model is
+# actually built, so a wrong-interpreter run gets this far and only fails HERE.
 if st.session_state.current_index != index_name:
     with st.spinner(f"Loading {selected_paper}..."):
-        st.session_state.rag = RAGPipeline(index_name)
+        try:
+            st.session_state.rag = RAGPipeline(index_name)
+        # Catch ImportError, not just ModuleNotFoundError: sentence-transformers
+        # swallows the missing peft module and re-raises a plain ImportError.
+        except ImportError as e:
+            st.error(_missing_dep_message(e))
+            st.stop()
         st.session_state.current_index = index_name
 
 # Main query interface

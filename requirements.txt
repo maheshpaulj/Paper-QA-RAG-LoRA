@@ -1,5 +1,6 @@
 pymupdf
 sentence-transformers
+torchvision
 peft
 faiss-cpu
 python-dotenv

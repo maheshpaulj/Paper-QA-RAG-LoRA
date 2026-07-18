@@ -45,11 +45,19 @@ solo gain collapses to noise once reranking is in the stack. See the findings lo
 
 **Streamlit app** (`app.py`) — interactive querying. Run locally or deploy to HF Spaces.
 
-```bash
-pip install -r requirements-app.txt
-streamlit run app.py
-# Visit http://localhost:8501
+```bat
+.venv\Scripts\python.exe -m pip install -r requirements.txt -r requirements-app.txt
+run_app.bat
+:: visit http://localhost:8501
 ```
+
+> **Use `run_app.bat`, not a bare `streamlit run app.py`.** If a global Python
+> also has streamlit installed, `streamlit` on PATH resolves to *that*
+> interpreter, which can't see this venv's packages. It gets far enough to open
+> the page and then dies on `No module named 'torchvision'` (or `peft`) when a
+> model loads — an error that looks like a missing install but isn't. The batch
+> file pins `.venv\Scripts\python.exe -m streamlit`; the app also detects the
+> case and names the offending interpreter instead of dumping a traceback.
 
 **Deploy to Hugging Face Spaces** — see `DEPLOY.md` for step-by-step instructions.
 Five minutes total: create a Space, copy files, push. It's live.
