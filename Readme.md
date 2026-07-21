@@ -1,4 +1,4 @@
-# Paper Q&A RAG (multimodal, single-paper)
+# Paper Q/A RAG LoRA
 
 Upload one research paper, ask natural-language questions, get grounded, cited,
 verified answers. Built phase by phase — each phase is independently demoable and
@@ -8,6 +8,8 @@ produces a number.
 routing, cross-encoder reranking, multimodal figure+caption retrieval, LoRA
 fine-tuned retriever, and a **Streamlit web UI** deployable to Hugging Face Spaces.
 Generation runs on **Cloudflare Workers AI** (`@cf/mistralai/mistral-small-3.1-24b-instruct`).
+
+![Screenshot](screenshots/ss.png)
 
 Measured over **125 questions across 5 papers** (retrieval-only, no LLM):
 
