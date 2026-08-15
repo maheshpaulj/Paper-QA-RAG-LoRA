@@ -1,0 +1,75 @@
+.chunk-list-container {
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 0.75rem;
+}
+
+.chunk-list-title {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.chunks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.chunk-card {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.chunk-card:hover {
+  border-color: var(--accent-purple);
+  background: rgba(108, 99, 255, 0.05);
+  transform: translateX(2px);
+}
+
+.chunk-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.chunk-badge {
+  background: var(--accent-teal);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 4px;
+}
+
+.chunk-meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.chunk-type-icon {
+  font-size: 0.8rem;
+}
+
+.chunk-preview {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.4;
+}
+
+.figure-text {
+  font-style: italic;
+  color: var(--text-secondary);
+}

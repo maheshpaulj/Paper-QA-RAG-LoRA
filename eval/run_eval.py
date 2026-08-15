@@ -18,19 +18,23 @@ embedder and reranker are shared, so the models load once).
 Retrieval metrics call only the retriever (no LLM), so they're free and isolate
 retrieval quality -- exactly what reranking and LoRA change. Run before/after
 each phase to get real deltas. The refusal check needs generation, so it's opt-in.
+
+Phase 6 refactor: uses LangChain LoRAEmbeddings + FAISS vectorstore + custom
+cross-encoder reranker. Same metrics, same numbers, LangChain plumbing.
 """
 import glob
 import json
 import sys
 from collections import defaultdict
 
-from src.embed import Embedder
-from src.retrieve import Retriever
+from src.lc.embeddings import LoRAEmbeddings
+from src.lc.store import load_vectorstore
+from src.lc.reranker import Reranker, build_reranking_retriever
 from config import TOP_K, RERANK_ENABLED, ROOT
 
 
-def chunk_is_relevant(chunk, gold_snippets):
-    text = chunk["text"].lower()
+def chunk_is_relevant(chunk_text, gold_snippets):
+    text = chunk_text.lower()
     return any(g.lower() in text for g in gold_snippets)
 
 
@@ -48,22 +52,27 @@ def run(paths, with_refusal=False):
     for it in items:
         by_index[it.get("index", "paper")].append(it)
 
-    embedder = Embedder()          # load the models once, reuse across papers
-    reranker = None
-    if RERANK_ENABLED:
-        from src.rerank import Reranker
-        reranker = Reranker()
+    # Load models once, reuse across papers
+    embeddings = LoRAEmbeddings()
+    reranker = Reranker() if RERANK_ENABLED else None
 
     rows, all_prec, all_hit = [], [], []
     for index_name, group in sorted(by_index.items()):
-        retriever = Retriever(index_name, embedder=embedder, reranker=reranker)
+        try:
+            vectorstore = load_vectorstore(index_name, embeddings)
+        except Exception as e:
+            print(f"[{index_name}] skipped: {e}")
+            continue
+
+        retrieve = build_reranking_retriever(vectorstore, reranker)
+
         prec, hit = [], []
         for it in group:
             if it["type"] != "in_scope" or not it.get("gold_snippets"):
                 continue
-            chunks = retriever.retrieve(it["question"], k=TOP_K)
-            rel = [chunk_is_relevant(c, it["gold_snippets"]) for c in chunks]
-            prec.append(sum(rel) / max(len(chunks), 1))
+            docs = retrieve(it["question"])
+            rel = [chunk_is_relevant(d.page_content, it["gold_snippets"]) for d in docs]
+            prec.append(sum(rel) / max(len(docs), 1))
             hit.append(1.0 if any(rel) else 0.0)
         if prec:
             rows.append((index_name, len(prec), sum(prec) / len(prec), sum(hit) / len(hit)))
@@ -85,18 +94,19 @@ def run(paths, with_refusal=False):
 
 def _run_refusal(by_index):
     """Out-of-scope refusal accuracy. Needs the LLM, so it spends API quota."""
-    from src.pipeline import RAGPipeline
-    from src.generate import REFUSAL_TEXT
+    from src.lc.chain import build_rag_chain
+    from src.lc.prompts import REFUSAL_TEXT
 
     correct = total = 0
     for index_name, group in sorted(by_index.items()):
         oos = [it for it in group if it["type"] == "out_of_scope"]
         if not oos:
             continue
-        rag = RAGPipeline(index_name)
+        chain = build_rag_chain(index_name)
         for it in oos:
             total += 1
-            if REFUSAL_TEXT.lower() in rag.ask(it["question"])["answer"].lower():
+            result = chain.invoke({"question": it["question"]})
+            if REFUSAL_TEXT.lower() in result["answer"].lower():
                 correct += 1
     if total:
         print(f"refusal acc:  {correct}/{total} = {correct / total:.3f}")

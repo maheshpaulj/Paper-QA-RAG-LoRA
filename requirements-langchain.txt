@@ -1,0 +1,7 @@
+langchain-core>=0.3
+langchain>=0.3
+langchain-community>=0.3
+langchain-openai>=0.3
+fastapi>=0.100
+uvicorn>=0.20
+python-multipart>=0.0.5

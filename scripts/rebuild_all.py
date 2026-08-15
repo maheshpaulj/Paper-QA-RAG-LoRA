@@ -7,32 +7,47 @@ vectors come from the old embedder, and a query embedded by a new model searched
 against old vectors is nonsense. It prints the model it used so a stale index is
 obvious.
 
-Papers are discovered from the indices on disk (each meta.json records the PDF it
-was built from). It used to be a hardcoded name->pdf map, which silently skipped
-any paper you added yourself and left it on stale vectors -- exactly the failure
-this script exists to prevent.
-
-Papers whose source PDF is missing are reported and skipped, not fatal: one gone
-PDF shouldn't abort the rebuild and leave the remaining indices half-updated.
+Phase 6 refactor: discovers indexes from both old format (*.faiss flat files)
+and new format (subdirectories with index.faiss). Old-format indexes are
+rebuilt into the new LangChain FAISS format.
 """
 import json
 
 from config import INDEX_DIR, ROOT
-from src.embed import active_model_name
+from src.lc.embeddings import active_model_name
 from scripts.build_index import main
 
 
 def discover():
-    """[(index_name, pdf_path)] for every built index, from its meta.json."""
-    found = []
+    """[(index_name, pdf_path)] for every built index.
+
+    Looks in two places:
+      - New format: index/<name>/meta.json (subdirectory per paper)
+      - Old format: index/<name>.meta.json (flat files, pre-Phase 6)
+    """
+    found = {}
+
+    # New format: subdirectories
+    for d in sorted(INDEX_DIR.iterdir()):
+        if d.is_dir() and (d / "index.faiss").exists():
+            meta_path = d / "meta.json"
+            src = None
+            if meta_path.exists():
+                src = json.loads(meta_path.read_text(encoding="utf-8")).get("source_pdf")
+            found[d.name] = src
+
+    # Old format: flat .faiss files (pre-Phase 6 migration)
     for faiss_path in sorted(INDEX_DIR.glob("*.faiss")):
         name = faiss_path.stem
+        if name in found:
+            continue  # already found in new format
         meta_path = INDEX_DIR / f"{name}.meta.json"
         src = None
         if meta_path.exists():
             src = json.loads(meta_path.read_text(encoding="utf-8")).get("source_pdf")
-        found.append((name, src))
-    return found
+        found[name] = src
+
+    return list(found.items())
 
 
 if __name__ == "__main__":

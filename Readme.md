@@ -4,9 +4,10 @@ Upload one research paper, ask natural-language questions, get grounded, cited,
 verified answers. Built phase by phase — each phase is independently demoable and
 produces a number.
 
-**Current status:** Phase 0–5 done. Text baseline RAG + eval harness, query
+**Current status:** Phase 0–6 done. Text baseline RAG + eval harness, query
 routing, cross-encoder reranking, multimodal figure+caption retrieval, LoRA
-fine-tuned retriever, and a **Streamlit web UI** deployable to Hugging Face Spaces.
+fine-tuned retriever, **LangChain LCEL pipeline**, **FastAPI backend**,
+**React frontend** with PDF viewer + chunk highlighting, and **Docker**.
 Generation runs on **Cloudflare Workers AI** (`@cf/mistralai/mistral-small-3.1-24b-instruct`).
 
 ![Screenshot](screenshots/ss.png)
@@ -34,7 +35,8 @@ solo gain collapses to noise once reranking is in the stack. See the findings lo
 | 2 | Cross-encoder reranking | `src/rerank.py`, `src/retrieve.py` | ✅ done |
 | 3 | Figures + captions, images to the LLM | `src/ingest.py`, `src/generate.py` | ✅ done |
 | 4 | LoRA fine-tuned embedding model (trained on Colab) | `scripts/make_train.py`, `colab/train_lora.ipynb` | ✅ done |
-| 5 | Streamlit UI, deploy to HF Spaces | `app.py`, `DEPLOY.md` | ✅ done |
+| 5 | Streamlit UI, deploy to HF Spaces | `app_streamlit.py`, `DEPLOY.md` | ✅ done |
+| 6 | LangChain + FastAPI + React + Docker | `src/lc/`, `api/`, `frontend/` | ✅ done |
 
 ## Tooling
 
@@ -624,6 +626,150 @@ worse than admitting the limit.
 - **The index must be rebuilt per model.** Queries embedded by one model compared
   against vectors built by another is meaningless, so `LORA=0/1` has to wrap
   `rebuild_all` *and* `run_eval`, not just the eval.
+
+## Phase 6 — LangChain + FastAPI + React + Docker
+
+Phase 6 refactors the RAG pipeline to use **LangChain** (LCEL chains, custom
+components), exposes it via **FastAPI**, replaces Streamlit with a **React
+frontend** (PDF viewer with chunk highlighting), and containerizes with
+**Docker**.
+
+The resume story: *"I built it from scratch first to understand the fundamentals
+(Phases 0–5), then refactored with production tooling (Phase 6)."*
+
+### What changed
+
+| Original (Phases 0–5) | Phase 6 (LangChain) | Why |
+|---|---|---|
+| `src/embed.py` — raw SentenceTransformer | `src/lc/embeddings.py` — custom `Embeddings` subclass | LoRA toggle + L2 normalization preserved inside LC interface |
+| `src/store.py` — manual FAISS + JSON | `src/lc/store.py` — LangChain FAISS vectorstore | Built-in metadata filtering, docstore, standard API |
+| `src/generate.py` — string-formatted prompts | `src/lc/prompts.py` — `ChatPromptTemplate` | Composable with LCEL chains |
+| `src/llm.py` — raw HTTP + retry | `ChatOpenAI` (in chain.py) | Both providers are OpenAI-compatible |
+| `src/pipeline.py` — manual if/elif | `src/lc/chain.py` — LCEL with route dispatch | Composable, debuggable, extensible |
+| `app.py` — Streamlit UI | `frontend/` — React + Vite + react-pdf | PDF viewer with chunk highlighting |
+| CLI scripts only | `api/` — FastAPI REST API | Backend/frontend separation |
+
+**What was preserved** (custom code wrapped in LC interfaces, not replaced):
+- `src/ingest.py` — section-aware chunking + figure extraction (used by `PaperLoader`)
+- `src/router.py` — regex-based query classifier (used by `RAGChain`)
+- `src/sections.py` — canonical section names (unchanged)
+- The LoRA model-loading logic (inside `LoRAEmbeddings`)
+
+### Architecture (Phase 6)
+
+```mermaid
+flowchart TB
+    subgraph BUILD ["Build — once per paper"]
+        direction LR
+        L["<b>PaperLoader</b><br/>(wraps ingest.py)<br/>pages · chunks · figures · meta"]
+        LE["<b>LoRAEmbeddings</b><br/>all-MiniLM-L6-v2<br/><i>± LoRA weights</i>"]
+        FS["<b>FAISS vectorstore</b><br/>index.faiss + index.pkl + meta.json"]
+        L --> LE --> FS
+    end
+
+    subgraph API ["FastAPI Backend"]
+        direction LR
+        EP["<b>/api/papers</b><br/>list · ingest · delete · PDF"]
+        EQ["<b>/api/ask</b><br/>question → answer"]
+    end
+
+    subgraph CHAIN ["LCEL Chain (RAGChain)"]
+        direction LR
+        RO["<b>router.py</b><br/>classify"]
+        RET["<b>Retriever</b><br/>FAISS + CrossEncoderReranker"]
+        PR["<b>ChatPromptTemplate</b><br/>+ ChatOpenAI"]
+        RO --> RET --> PR
+    end
+
+    subgraph UI ["React Frontend"]
+        direction LR
+        PDF["<b>PdfViewer</b><br/>react-pdf + highlights"]
+        CHAT["<b>ChatPanel</b><br/>Q&A + citations"]
+        SB["<b>Sidebar</b><br/>papers + upload"]
+    end
+
+    FS -. "index/" .-> RET
+    EQ --> CHAIN
+    UI -- "HTTP" --> API
+
+    classDef m fill:#f1f3f4,stroke:#5f6368
+    classDef lc fill:#e8f0fe,stroke:#4285f4
+    classDef ui fill:#fef7e0,stroke:#fbbc04
+    class L,LE,FS m
+    class RO,RET,PR lc
+    class PDF,CHAT,SB ui
+    class EP,EQ m
+```
+
+### LangChain component map
+
+| Component | LangChain class | Custom? | Where |
+|---|---|---|---|
+| `LoRAEmbeddings` | `langchain_core.embeddings.Embeddings` | Yes — wraps SentenceTransformer + LoRA toggle | `src/lc/embeddings.py` |
+| `PaperLoader` | `langchain_core.document_loaders.BaseLoader` | Yes — wraps ingest.py | `src/lc/loader.py` |
+| Vectorstore | `langchain_community.vectorstores.FAISS` | No — standard LC FAISS | `src/lc/store.py` |
+| Reranker | `CrossEncoderReranker` + `ContextualCompressionRetriever` | No — standard LC | `src/lc/chain.py` |
+| Prompts | `ChatPromptTemplate` | No — standard LC | `src/lc/prompts.py` |
+| LLM | `ChatOpenAI` (works for both Cloudflare + OpenRouter) | No — standard LC | `src/lc/chain.py` |
+| Pipeline | `RAGChain` (custom class using LCEL internally) | Yes — route dispatch | `src/lc/chain.py` |
+
+### FastAPI endpoints
+
+| Method | Endpoint | What it does |
+|--------|----------|--------------|
+| `GET` | `/api/papers` | List all indexed papers with titles |
+| `POST` | `/api/papers/ingest` | Upload a PDF, build the index |
+| `DELETE` | `/api/papers/{name}` | Remove a paper's index |
+| `GET` | `/api/papers/{name}/pdf` | Serve the PDF for the frontend viewer |
+| `POST` | `/api/ask` | Ask a question, get an answer with citations + chunks |
+| `POST` | `/api/arxiv/fetch` | Download a paper from arXiv by ID |
+
+### React frontend
+
+Three-panel layout: sidebar (paper list + upload) | PDF viewer (react-pdf with
+chunk highlighting) | chat panel (Q&A with citations).
+
+- **PDF viewer** uses `react-pdf` with `customTextRenderer` to highlight
+  retrieved chunk text directly on the PDF pages
+- **Chunk highlighting** — different colors per chunk, clicking a chunk scrolls
+  the PDF to its page
+- **Upload flow** — drag-and-drop PDF upload, auto-names the index
+- **Dark mode** by default with glassmorphism design
+
+### Running Phase 6
+
+```bat
+:: Backend (FastAPI)
+run_api.bat
+:: → http://localhost:8000  (API docs at /docs)
+
+:: Frontend (React + Vite)
+cd frontend
+npm run dev
+:: → http://localhost:5173  (proxies /api to :8000)
+
+:: Or with Docker
+docker-compose up
+:: → frontend at http://localhost:3000, backend at http://localhost:8000
+```
+
+### Index format change
+
+Phase 6 switches from flat files to subdirectories:
+
+```
+Before:  index/paper.faiss + index/paper.chunks.json + index/paper.meta.json
+After:   index/paper/index.faiss + index/paper/index.pkl + index/paper/meta.json
+```
+
+`scripts/rebuild_all.py` discovers both formats and rebuilds into the new one.
+The old flat files can be deleted after a successful rebuild.
+
+### Eval numbers (Phase 6 verification)
+
+The LangChain refactor must produce **identical retrieval metrics** — same
+embeddings, same FAISS index, same cross-encoder. Any drift means the
+migration broke something. eval numbers are updated after verification.
 
 ## Known gaps
 

@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.git/
+.claude/
+.env
+node_modules/
+frontend/node_modules/
+frontend/dist/
+screenshots/
+colab/
+*.egg-info/
+.streamlit/

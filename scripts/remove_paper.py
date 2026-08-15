@@ -10,6 +10,9 @@ data/ is left alone, so `build_index` can recreate it.
 Refuses to touch a paper that has an eval set (eval/eval_set_<name>.json) unless
 --force is given: dropping one of those silently changes what `run_eval` measures
 and makes the before/after numbers in the README non-reproducible.
+
+Phase 6 refactor: handles both old format (flat .faiss files) and new format
+(subdirectory per paper).
 """
 import shutil
 import sys
@@ -20,7 +23,16 @@ EVAL_DIR = ROOT / "eval"
 
 
 def built_indices():
-    return sorted(p.stem for p in INDEX_DIR.glob("*.faiss"))
+    """All index names, from both old and new format."""
+    found = set()
+    # New format: subdirectories with index.faiss
+    for d in INDEX_DIR.iterdir():
+        if d.is_dir() and (d / "index.faiss").exists():
+            found.add(d.name)
+    # Old format: flat .faiss files
+    for p in INDEX_DIR.glob("*.faiss"):
+        found.add(p.stem)
+    return sorted(found)
 
 
 def has_eval_set(name):
@@ -28,14 +40,20 @@ def has_eval_set(name):
 
 
 def remove(name, force=False):
-    targets = [
+    # New format targets
+    new_dir = INDEX_DIR / name
+    # Old format targets
+    old_targets = [
         INDEX_DIR / f"{name}.faiss",
         INDEX_DIR / f"{name}.chunks.json",
         INDEX_DIR / f"{name}.meta.json",
     ]
     figures = FIGURE_DIR / name
 
-    if not any(t.exists() for t in targets):
+    has_old = any(t.exists() for t in old_targets)
+    has_new = new_dir.is_dir() and (new_dir / "index.faiss").exists()
+
+    if not has_old and not has_new:
         print(f"[{name}] no index found -- nothing to remove")
         return False
 
@@ -46,9 +64,14 @@ def remove(name, force=False):
         print("         Re-run with --force if you really mean it.")
         return False
 
-    for t in targets:
+    # Remove new format
+    if has_new:
+        shutil.rmtree(new_dir)
+    # Remove old format
+    for t in old_targets:
         if t.exists():
             t.unlink()
+    # Remove figures
     if figures.is_dir():
         shutil.rmtree(figures)
 

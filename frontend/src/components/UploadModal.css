@@ -1,0 +1,111 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 450px;
+  padding: 2rem;
+  border-radius: 16px;
+  position: relative;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.modal-content h2 {
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.drop-zone {
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s;
+  background: rgba(0, 0, 0, 0.2);
+}
+.drop-zone:hover {
+  border-color: var(--accent-purple);
+  background: rgba(108, 99, 255, 0.05);
+}
+
+.drop-prompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--text-secondary);
+}
+
+.upload-icon {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.or {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+}
+
+.file-selected {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--accent-teal);
+}
+
+.file-icon {
+  font-size: 2.5rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.input-group label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.w-full {
+  width: 100%;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+
+.error-msg {
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  text-align: center;
+}

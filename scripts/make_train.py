@@ -15,6 +15,9 @@ Two rules this script enforces, because getting them wrong invalidates Phase 4:
      teaches nothing. We embed the query, search the paper's own index, and take
      the top-ranked chunks that are NOT the positive -- the ones the current
      model already confuses. That is what the fine-tune has to fix.
+
+Phase 6 refactor: uses LangChain LoRAEmbeddings + FAISS vectorstore. Same
+triplet generation logic, LangChain plumbing.
 """
 import json
 import re
@@ -22,8 +25,8 @@ import sys
 import glob
 
 from src.llm import chat
-from src.embed import Embedder
-from src.retrieve import Retriever
+from src.lc.embeddings import LoRAEmbeddings
+from src.lc.store import load_vectorstore
 from config import INDEX_DIR, ROOT
 
 BATCH = 8
@@ -74,12 +77,17 @@ def eval_indices():
     return {n for n in names if n}
 
 
-def text_chunks(name):
-    chunks = json.load(open(INDEX_DIR / f"{name}.chunks.json", encoding="utf-8"))
-    return [c for c in chunks
-            if c.get("type") != "figure"
-            and c.get("section") != "References"
-            and len(c["text"]) > 220]
+def text_chunks_from_vectorstore(name, embeddings):
+    """Load all text chunks from a vectorstore, filtering out figures and refs."""
+    vectorstore = load_vectorstore(name, embeddings)
+    all_docs = list(vectorstore.docstore._dict.values())
+    return [
+        {"id": d.metadata.get("id", "?"), "text": d.page_content, **d.metadata}
+        for d in all_docs
+        if d.metadata.get("type") != "figure"
+        and d.metadata.get("section") != "References"
+        and len(d.page_content) > 220
+    ]
 
 
 def build(names, n_per_paper=50, out=None):
@@ -90,7 +98,7 @@ def build(names, n_per_paper=50, out=None):
             f"evaluate on makes the Phase 4 number meaningless. Use other papers."
         )
 
-    embedder = Embedder()  # the pre-LoRA model: negatives it confuses are the useful ones
+    embeddings = LoRAEmbeddings()
     triplets = []
     out = out or (ROOT / "train" / "triplets.jsonl")
     out.parent.mkdir(exist_ok=True)
@@ -104,13 +112,16 @@ def build(names, n_per_paper=50, out=None):
 
     for name in names:
         try:
-            chunks = text_chunks(name)
-        except FileNotFoundError:
-            print(f"[{name}] no index -- run build_index first; skipping")
+            chunks = text_chunks_from_vectorstore(name, embeddings)
+        except Exception as e:
+            print(f"[{name}] no index -- run build_index first; skipping ({e})")
             continue
         by_id = {c["id"]: c for c in chunks}
-        # rerank off: we want the bi-encoder's own confusions as negatives
-        retriever = Retriever(name, embedder=embedder, rerank=False)
+
+        # Use vectorstore retriever without reranking -- we want the bi-encoder's
+        # own confusions as negatives
+        vectorstore = load_vectorstore(name, embeddings)
+        retriever = vectorstore.as_retriever(search_kwargs={"k": CANDIDATE_DEPTH})
         made = 0
 
         for i in range(0, len(chunks), BATCH):
@@ -129,13 +140,17 @@ def build(names, n_per_paper=50, out=None):
                 q = (r.get("question") or "").strip()
                 if not (pos and q):
                     continue
-                negs = [c for c in retriever.retrieve(q, k=CANDIDATE_DEPTH)
-                        if c["id"] != pos["id"] and c.get("type") != "figure"]
+                neg_docs = retriever.invoke(q)
+                negs = [
+                    d for d in neg_docs
+                    if d.metadata.get("id") != pos["id"]
+                    and d.metadata.get("type") != "figure"
+                ]
                 for neg in negs[:NEGATIVES_PER_QUERY]:
                     triplets.append({
                         "query": q,
                         "positive": pos["text"],
-                        "negative": neg["text"],
+                        "negative": neg.page_content,
                         "paper": name,
                     })
                     made += 1
