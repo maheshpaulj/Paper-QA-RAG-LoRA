@@ -42,7 +42,10 @@ class LoRAEmbeddings(Embeddings):
 
     def __init__(self, model_name: str | None = None):
         self.model_name = model_name or active_model_name()
-        self._model = SentenceTransformer(self.model_name)
+        try:
+            self._model = SentenceTransformer(self.model_name)
+        except Exception:
+            self._model = SentenceTransformer(self.model_name, local_files_only=True)
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         """Embed a list of texts (chunks/documents)."""
@@ -57,3 +60,15 @@ class LoRAEmbeddings(Embeddings):
     def embed_query(self, text: str) -> List[float]:
         """Embed a single query string."""
         return self.embed_documents([text])[0]
+
+
+_GLOBAL_EMBEDDINGS: LoRAEmbeddings | None = None
+
+
+def get_embeddings(model_name: str | None = None) -> LoRAEmbeddings:
+    """Singleton getter for the LoRAEmbeddings instance."""
+    global _GLOBAL_EMBEDDINGS
+    target = model_name or active_model_name()
+    if _GLOBAL_EMBEDDINGS is None or _GLOBAL_EMBEDDINGS.model_name != target:
+        _GLOBAL_EMBEDDINGS = LoRAEmbeddings(target)
+    return _GLOBAL_EMBEDDINGS

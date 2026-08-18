@@ -17,9 +17,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from fastapi.staticfiles import StaticFiles
+from config import FIGURE_DIR
+
 app.include_router(papers.router, prefix="/api/papers", tags=["papers"])
 app.include_router(query.router, prefix="/api", tags=["query"])
 app.include_router(arxiv.router, prefix="/api/arxiv", tags=["arxiv"])
+app.mount("/api/figures", StaticFiles(directory=str(FIGURE_DIR)), name="figures")
 
 @app.get("/")
 async def root():

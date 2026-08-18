@@ -17,6 +17,7 @@ class ChunkSchema(BaseModel):
     type: str = 'text'
     score: Optional[float] = None
     image_path: Optional[str] = None
+    image_url: Optional[str] = None
 
 class AskResponse(BaseModel):
     """Response model for a question."""
@@ -30,6 +31,7 @@ class PaperInfo(BaseModel):
     index_name: str
     title: str
     page_count: Optional[int] = None
+    reference_count: Optional[int] = None
 
 class IngestResponse(BaseModel):
     """Response model for document ingestion."""

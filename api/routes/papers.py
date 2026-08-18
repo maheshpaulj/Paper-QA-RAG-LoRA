@@ -27,17 +27,41 @@ except ImportError:
 
 router = APIRouter()
 
+KNOWN_TITLES = {
+    "imagenet": "ImageNet: A Large-Scale Hierarchical Image Database",
+    "transformer": "Attention Is All You Need (Transformer)",
+    "resnet": "Deep Residual Learning for Image Recognition (ResNet)",
+    "vgg": "Very Deep Convolutional Networks for Large-Scale Image Recognition (VGG)",
+    "bert": "BERT: Pre-training of Deep Bidirectional Transformers",
+    "gpt3": "Language Models are Few-Shot Learners (GPT-3)",
+    "tr_adam": "Adam: A Method for Stochastic Optimization",
+    "tr_batchnorm": "Batch Normalization: Accelerating Deep Network Training",
+    "tr_densenet": "Densely Connected Convolutional Networks (DenseNet)",
+    "tr_efficientnet": "EfficientNet: Rethinking Model Scaling for CNNs",
+    "tr_mobilenet": "MobileNets: Efficient Convolutional Neural Networks",
+    "tr_vit": "An Image is Worth 16x16 Words: Transformers for Image Recognition",
+    "AR": "Conference Paper Revised",
+}
+
+
 @router.get("", response_model=List[PaperInfo])
 def list_papers():
-    """List all indexed papers."""
+    """List all indexed papers with clean metadata."""
     try:
         indexes = list_indexes()
         papers = []
         for name in indexes:
             meta = load_meta(name)
-            title = meta.get("title", name)
+            raw_title = (meta.get("title") or "").strip()
+            title = KNOWN_TITLES.get(name) or (raw_title if raw_title and raw_title != "Untitled" else name)
             page_count = meta.get("page_count", None)
-            papers.append(PaperInfo(index_name=name, title=title, page_count=page_count))
+            ref_count = meta.get("reference_count", None)
+            papers.append(PaperInfo(
+                index_name=name,
+                title=title,
+                page_count=page_count,
+                reference_count=ref_count
+            ))
         return papers
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -98,3 +122,11 @@ def get_paper_pdf(name: str):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/figures/{name}/{filename}")
+def get_figure_image(name: str, filename: str):
+    """Serve a cropped figure/table image from a paper."""
+    fig_path = Path(FIGURE_DIR) / name / filename
+    if not fig_path.exists():
+        raise HTTPException(status_code=404, detail="Figure image not found.")
+    return FileResponse(path=fig_path, media_type="image/png")

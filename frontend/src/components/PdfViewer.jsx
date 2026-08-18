@@ -1,111 +1,260 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { getPdfUrl } from '../api/client';
+import ChunkList from './ChunkList';
+import { getChunkColor } from '../utils/chunkColors';
 import 'react-pdf/dist/Page/TextLayer.css';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import './PdfViewer.css';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// Configure pdfjs worker for version 3.11.174
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version || '3.11.174'}/build/pdf.worker.min.js`;
 
-const PdfViewer = ({ paper, activeChunks = [], targetPage }) => {
+const PdfViewer = ({
+  paper,
+  activeChunks = [],
+  targetPage,
+  highlightChunkId,
+  onClose,
+}) => {
   const [numPages, setNumPages] = useState(null);
-  const [scale, setScale] = useState(1.2);
+  const [scale, setScale] = useState(1.1);
+  const [activeTab, setActiveTab] = useState('pdf'); // 'pdf' | 'chunks'
+  const [currentPageInput, setCurrentPageInput] = useState(1);
+  const [loadError, setLoadError] = useState(null);
   const containerRef = useRef(null);
   const pageRefs = useRef({});
 
+  // Reset when selected paper changes
+  useEffect(() => {
+    setLoadError(null);
+    setNumPages(null);
+    setCurrentPageInput(1);
+  }, [paper?.index_name]);
+
+  // Smooth scroll to page when targetPage updates
   useEffect(() => {
     if (targetPage && pageRefs.current[targetPage]) {
-      pageRefs.current[targetPage].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setActiveTab('pdf');
+      pageRefs.current[targetPage].scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+      setCurrentPageInput(targetPage);
     }
-  }, [targetPage]);
+  }, [targetPage, highlightChunkId]);
 
   const onDocumentLoadSuccess = ({ numPages }) => {
     setNumPages(numPages);
+    setLoadError(null);
   };
 
-  const getHighlightColor = (chunkId) => {
-    // Map chunk to a color based on its index in activeChunks
-    const idx = activeChunks.findIndex(c => c.id === chunkId);
-    if (idx === -1) return 'var(--accent-purple)';
-    const colors = [
-      'var(--color-chunk-1)', 
-      'var(--color-chunk-2)', 
-      'var(--color-chunk-3)', 
-      'var(--color-chunk-4)', 
-      'var(--color-chunk-5)'
-    ];
-    return colors[idx % colors.length];
+  const onDocumentLoadError = (error) => {
+    console.error('react-pdf document load error:', error);
+    setLoadError(error.message || 'Failed to load PDF document.');
   };
 
-  const textRenderer = (textItem, pageNumber) => {
-    const text = textItem.str;
-    if (!activeChunks || activeChunks.length === 0 || !text.trim()) return text;
-
-    const chunksOnPage = activeChunks.filter(c => c.page === pageNumber);
-    if (chunksOnPage.length === 0) return text;
-
-    // Check if this text fragment is part of any retrieved chunk.
-    // PDF text layer gives us small fragments (words/phrases), so we check
-    // if the chunk text contains this fragment.
-    for (let i = 0; i < chunksOnPage.length; i++) {
-      const chunk = chunksOnPage[i];
-      if (!chunk.text) continue;
-      const chunkLower = chunk.text.toLowerCase();
-      const textLower = text.toLowerCase();
-
-      if (textLower.length > 2 && chunkLower.includes(textLower)) {
-        const colors = [
-          'rgba(108, 99, 255, 0.35)',
-          'rgba(0, 212, 170, 0.35)',
-          'rgba(255, 107, 107, 0.35)',
-          'rgba(254, 202, 87, 0.35)',
-          'rgba(72, 219, 251, 0.35)',
-        ];
-        const color = colors[i % colors.length];
-        return `<mark style="background-color: ${color}; border-radius: 2px; padding: 0 1px;">${text}</mark>`;
+  // Text layer highlight matcher
+  const textRenderer = useCallback(
+    (textItem, pageNumber) => {
+      const text = textItem.str;
+      if (!activeChunks || activeChunks.length === 0 || !text || !text.trim()) {
+        return text;
       }
-    }
 
-    return text;
+      const pageChunks = activeChunks.filter((c) => c.page === pageNumber);
+      if (pageChunks.length === 0) return text;
+
+      const textLower = text.toLowerCase().trim();
+      if (textLower.length < 3) return text;
+
+      for (let i = 0; i < pageChunks.length; i++) {
+        const chunk = pageChunks[i];
+        if (!chunk.text) continue;
+        const chunkLower = chunk.text.toLowerCase();
+
+        if (chunkLower.includes(textLower)) {
+          const color = getChunkColor(chunk, i);
+          return `<mark class="chunk-highlight-mark" style="background-color: ${color.mark}; border-bottom: 2px solid ${color.border};" title="${chunk.id || `Chunk ${i + 1}`}">${text}</mark>`;
+        }
+      }
+
+      return text;
+    },
+    [activeChunks]
+  );
+
+  const handlePageJump = (e) => {
+    e.preventDefault();
+    const page = parseInt(currentPageInput, 10);
+    if (page >= 1 && numPages && page <= numPages && pageRefs.current[page]) {
+      pageRefs.current[page].scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
+
+  const pdfUrl = paper ? getPdfUrl(paper.index_name) : null;
 
   return (
-    <div className="pdf-viewer-container">
-      <div className="pdf-toolbar glass-panel">
-        <h3>{paper.title || paper.index_name}</h3>
-        <div className="pdf-controls">
-          <button className="btn" onClick={() => setScale(s => Math.max(0.5, s - 0.1))}>-</button>
-          <span>{Math.round(scale * 100)}%</span>
-          <button className="btn" onClick={() => setScale(s => Math.min(2.5, s + 0.1))}>+</button>
+    <div className="pdf-panel-wrapper">
+      {/* Top Header & Tabs */}
+      <div className="pdf-panel-header">
+        <div className="pdf-tabs-group">
+          <button
+            className={`pdf-tab-trigger ${activeTab === 'pdf' ? 'active' : ''}`}
+            onClick={() => setActiveTab('pdf')}
+          >
+            PDF Document
+          </button>
+          <button
+            className={`pdf-tab-trigger ${activeTab === 'chunks' ? 'active' : ''}`}
+            onClick={() => setActiveTab('chunks')}
+          >
+            Chunks ({activeChunks.length})
+          </button>
         </div>
+
+        <button className="icon-btn" onClick={onClose} title="Close PDF viewer">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
-      <div className="pdf-scroll-area" ref={containerRef}>
-        <Document
-          file={getPdfUrl(paper.index_name)}
-          onLoadSuccess={onDocumentLoadSuccess}
-          loading={<div className="pdf-loading"><div className="spinner"></div><p>Loading PDF...</p></div>}
-          error={<div className="pdf-error">Failed to load PDF.</div>}
-        >
-          {numPages && Array.from(new Array(numPages), (el, index) => (
-            <div 
-              key={`page_${index + 1}`} 
-              className="pdf-page-wrapper"
-              ref={el => pageRefs.current[index + 1] = el}
-              data-page={index + 1}
-            >
-              <div className="page-number-indicator">Page {index + 1}</div>
-              <Page 
-                pageNumber={index + 1} 
-                scale={scale} 
-                customTextRenderer={({ str, itemIndex }) => textRenderer({str}, index + 1)}
-                renderAnnotationLayer={true}
-                renderTextLayer={true}
-              />
+      {activeTab === 'pdf' && (
+        <>
+          {/* Sub Toolbar */}
+          <div className="pdf-sub-toolbar">
+            <div className="zoom-controls-row">
+              <button
+                className="icon-btn"
+                onClick={() => setScale((s) => Math.max(0.6, s - 0.15))}
+                title="Zoom Out"
+              >
+                -
+              </button>
+              <span className="zoom-pct-display">{Math.round(scale * 100)}%</span>
+              <button
+                className="icon-btn"
+                onClick={() => setScale((s) => Math.min(2.2, s + 0.15))}
+                title="Zoom In"
+              >
+                +
+              </button>
+              <button
+                className="btn btn-ghost"
+                style={{ fontSize: '11px', padding: '2px 6px' }}
+                onClick={() => setScale(1.1)}
+                title="Reset zoom"
+              >
+                Reset
+              </button>
             </div>
-          ))}
-        </Document>
-      </div>
+
+            {numPages && (
+              <form className="page-jump-form" onSubmit={handlePageJump}>
+                <span>Page</span>
+                <input
+                  type="number"
+                  className="page-input-box"
+                  min="1"
+                  max={numPages}
+                  value={currentPageInput}
+                  onChange={(e) => setCurrentPageInput(e.target.value)}
+                />
+                <span>/ {numPages}</span>
+              </form>
+            )}
+          </div>
+
+          {/* PDF Canvas */}
+          <div className="pdf-canvas-feed" ref={containerRef}>
+            {pdfUrl ? (
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={onDocumentLoadError}
+                loading={
+                  <div className="pdf-state-container">
+                    <p>Loading document...</p>
+                  </div>
+                }
+                error={
+                  <div className="pdf-state-container">
+                    <div className="pdf-error-dialog">
+                      <p><strong>Failed to load PDF</strong></p>
+                      <p style={{ fontSize: '12px', marginTop: '6px', color: 'var(--text-secondary)' }}>
+                        {loadError || 'Could not fetch file from server.'}
+                      </p>
+                      <a
+                        href={pdfUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="btn btn-primary"
+                        style={{ marginTop: '12px', display: 'inline-flex' }}
+                      >
+                        Open PDF In Tab ↗
+                      </a>
+                    </div>
+                  </div>
+                }
+              >
+                {numPages &&
+                  Array.from(new Array(numPages), (el, index) => {
+                    const pageNum = index + 1;
+                    const isTarget = targetPage === pageNum;
+                    const hasChunks = activeChunks.some((c) => c.page === pageNum);
+
+                    return (
+                      <div
+                        key={`page_${pageNum}`}
+                        className={`pdf-page-container ${isTarget ? 'targeted-page' : ''}`}
+                        ref={(el) => (pageRefs.current[pageNum] = el)}
+                        data-page={pageNum}
+                      >
+                        <div className="page-corner-badge">
+                          p.{pageNum} {hasChunks && '• Highlighted'}
+                        </div>
+                        <Page
+                          pageNumber={pageNum}
+                          scale={scale}
+                          customTextRenderer={({ str }) =>
+                            textRenderer({ str }, pageNum)
+                          }
+                          renderAnnotationLayer={true}
+                          renderTextLayer={true}
+                        />
+                      </div>
+                    );
+                  })}
+              </Document>
+            ) : (
+              <div className="pdf-state-container">
+                <p>No paper selected.</p>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+
+      {activeTab === 'chunks' && (
+        <div className="chunks-tab-content">
+          <ChunkList
+            chunks={activeChunks}
+            onNavigateToPage={(page, id) => {
+              setActiveTab('pdf');
+              setTimeout(() => {
+                if (pageRefs.current[page]) {
+                  pageRefs.current[page].scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }
+              }, 100);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 };

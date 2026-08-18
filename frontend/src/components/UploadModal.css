@@ -1,111 +1,132 @@
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  backdrop-filter: blur(4px);
-}
-
-.modal-content {
-  width: 90%;
-  max-width: 450px;
-  padding: 2rem;
-  border-radius: 16px;
+.upload-modal-content {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  max-width: 460px;
+  width: 100%;
+  padding: 24px;
   position: relative;
-  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  animation: modalSlide 0.16s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes modalSlide {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
-.modal-close {
-  position: absolute;
-  top: 1rem;
-  right: 1.5rem;
-  background: none;
+.upload-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.upload-modal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-close-icon {
+  background: transparent;
   border: none;
-  color: var(--text-secondary);
-  font-size: 1.5rem;
+  color: var(--text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-xs);
+}
+
+.modal-close-icon:hover {
+  color: var(--text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.drop-area-box {
+  border: 1.5px dashed var(--border-medium);
+  border-radius: var(--radius-md);
+  padding: 32px 16px;
+  text-align: center;
+  margin-bottom: 16px;
+  background: var(--bg-sidebar);
+  transition: all 0.15s ease;
   cursor: pointer;
 }
 
-.modal-content h2 {
-  margin-bottom: 1.5rem;
-  font-weight: 600;
+.drop-area-box:hover {
+  border-color: var(--accent-primary);
+  background: var(--bg-surface);
 }
 
-.drop-zone {
-  border: 2px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 12px;
-  padding: 3rem 2rem;
-  text-align: center;
-  margin-bottom: 1.5rem;
-  transition: all 0.2s;
-  background: rgba(0, 0, 0, 0.2);
-}
-.drop-zone:hover {
-  border-color: var(--accent-purple);
-  background: rgba(108, 99, 255, 0.05);
-}
-
-.drop-prompt {
+.drop-icon-wrap {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  justify-content: center;
+  margin: 0 auto 10px auto;
   color: var(--text-secondary);
 }
 
-.upload-icon {
-  font-size: 2.5rem;
-  margin-bottom: 0.5rem;
+.drop-main-text {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
 }
 
-.or {
-  margin: 0.5rem 0;
-  font-size: 0.85rem;
+.drop-sub-text {
+  font-size: 11.5px;
+  color: var(--text-tertiary);
+  margin-top: 4px;
 }
 
-.file-selected {
+.file-selected-pill {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--accent-teal);
+  gap: 8px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  margin-bottom: 14px;
+  font-size: 12.5px;
+  color: var(--text-primary);
 }
 
-.file-icon {
-  font-size: 2.5rem;
+.file-selected-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.input-group {
+.form-group-block {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 6px;
+  margin-bottom: 16px;
 }
-.input-group label {
-  font-size: 0.85rem;
+
+.form-group-block label {
+  font-size: 12px;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 
-.w-full {
+.form-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.modal-action-btn {
   width: 100%;
-}
-.mt-4 {
-  margin-top: 1rem;
-}
-
-.error-msg {
-  color: #ff6b6b;
-  font-size: 0.85rem;
-  margin-top: 0.5rem;
-  text-align: center;
+  padding: 9px;
+  font-size: 13px;
+  font-weight: 500;
 }

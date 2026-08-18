@@ -51,10 +51,36 @@ def extract_meta(pdf_path):
     doc = fitz.open(pdf_path)
     md = doc.metadata or {}
     text = "\n".join(page.get_text("text") for page in doc)
+    
+    pub_date = None
+    pub_year = None
+    
+    creation_date = md.get("creationDate")
+    if creation_date:
+        date_match = re.search(r"D:(\d{4})(\d{2})(\d{2})", creation_date)
+        if date_match:
+            pub_year = date_match.group(1)
+            pub_date = f"{date_match.group(1)}-{date_match.group(2)}-{date_match.group(3)}"
+
+    if not pub_date:
+        # Look for arXiv date in first 1000 chars
+        arxiv_match = re.search(r"arXiv:\d{4}\.\d{4,5}v\d+\s+\[.*?\]\s+(\d{1,2}\s+[A-Z][a-z]+\s+\d{4})", text[:1000], re.IGNORECASE)
+        if arxiv_match:
+            pub_date = arxiv_match.group(1)
+            pub_year = pub_date.split()[-1]
+        else:
+            # Look for typical month year pattern
+            date_match = re.search(r"(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})", text[:1000], re.IGNORECASE)
+            if date_match:
+                pub_date = f"{date_match.group(1)} {date_match.group(2)}"
+                pub_year = date_match.group(2)
+
     meta = {
         "page_count": doc.page_count,
         "title": (md.get("title") or "").strip() or "Untitled",
         "reference_count": count_references(text),  # None when not countable
+        "publication_date": pub_date,
+        "publication_year": pub_year,
     }
     doc.close()
     return meta

@@ -1,75 +1,85 @@
 .chunk-list-container {
-  margin-top: 0.5rem;
-  border-top: 1px solid rgba(255,255,255,0.05);
-  padding-top: 0.75rem;
-}
-
-.chunk-list-title {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
-  letter-spacing: 0.5px;
-}
-
-.chunks {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 10px;
+  width: 100%;
 }
 
-.chunk-card {
-  background: rgba(0,0,0,0.2);
+.chunk-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.chunks-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chunk-card-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
-  border-radius: 8px;
-  padding: 8px 10px;
+  border-radius: var(--radius-md);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.12s ease;
+  user-select: none;
 }
 
-.chunk-card:hover {
-  border-color: var(--accent-purple);
-  background: rgba(108, 99, 255, 0.05);
-  transform: translateX(2px);
+.chunk-card-item:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-medium);
+  transform: translateY(-1px);
 }
 
-.chunk-header {
+.chunk-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chunk-id-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+}
+
+.chunk-card-tags {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin-bottom: 4px;
+  font-size: 11px;
+  color: var(--text-tertiary);
 }
 
-.chunk-badge {
-  background: var(--accent-teal);
-  color: #000;
-  font-size: 0.65rem;
-  font-weight: 700;
-  padding: 1px 4px;
-  border-radius: 4px;
+.chunk-image-preview-thumb {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: var(--radius-xs);
+  margin-top: 4px;
+  background: #000;
+  border: 1px solid var(--border-subtle);
 }
 
-.chunk-meta {
-  font-size: 0.75rem;
+.chunk-text-snippet {
+  font-size: 12px;
   color: var(--text-secondary);
-  font-weight: 500;
-  flex: 1;
-  white-space: nowrap;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-.chunk-type-icon {
-  font-size: 0.8rem;
-}
-
-.chunk-preview {
-  font-size: 0.8rem;
-  color: rgba(255,255,255,0.8);
-  line-height: 1.4;
-}
-
-.figure-text {
-  font-style: italic;
-  color: var(--text-secondary);
 }

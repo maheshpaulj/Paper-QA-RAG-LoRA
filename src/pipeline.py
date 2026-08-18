@@ -26,6 +26,22 @@ class RAGPipeline:
             # title page, so read them out of the front matter instead of giving
             # up. Only page count is metadata-only, and that path always answers.
             chunks = self.retriever.front_matter()
+            
+            meta = self.retriever.store.meta
+            title = meta.get("title", "Untitled")
+            pub_date = meta.get("publication_date")
+            pub_year = meta.get("publication_year")
+            
+            meta_context = f"Document Metadata (Highest Priority):\nTitle: {title}\n"
+            if pub_date:
+                meta_context += f"Publication Date: {pub_date}\n"
+            if pub_year:
+                meta_context += f"Publication Year: {pub_year}\n"
+                
+            if chunks:
+                chunks[0] = dict(chunks[0])
+                chunks[0]["text"] = f"{meta_context}\n\n{chunks[0]['text']}"
+                
             return self._result(question, self.generator.answer(question, chunks),
                                 chunks, "metadata+text")
 

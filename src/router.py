@@ -17,8 +17,9 @@ from src.sections import canonical
 METADATA_RE = re.compile(
     r"\b(how many pages|number of pages|page count|how long is (?:this|the)|"
     r"who (?:wrote|are the authors?|is the author)|author'?s? names?|"
-    r"what is the title|when was (?:it|this) published|"
-    # counting the bibliography -- a count is not retrievable from top-k chunks
+    r"what is the title|what(?:'s| is) (?:the |this )?paper(?:'s)? title|"
+    r"when was (?:it|this|this paper|the paper) published|publication (?:date|year)|"
+    r"what year was (?:it|this|this paper|the paper) published|"
     r"how many (?:references|citations|papers are cited)|"
     r"number of (?:references|citations))\b",
     re.IGNORECASE,

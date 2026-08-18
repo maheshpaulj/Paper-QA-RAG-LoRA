@@ -18,16 +18,23 @@ from sentence_transformers import CrossEncoder
 from config import RERANK_MODEL, RERANK_ENABLED, TOP_K, RERANK_CANDIDATES
 
 
+_GLOBAL_RERANKER: Reranker | None = None
+
+
 class Reranker:
     """Cross-encoder reranker for LangChain Documents.
 
     Usage:
-        reranker = Reranker()
+        reranker = get_reranker()
         reranked = reranker.rerank(query, docs, top_n=5)
     """
 
     def __init__(self, model_name: str = RERANK_MODEL):
-        self._model = CrossEncoder(model_name)
+        try:
+            self._model = CrossEncoder(model_name)
+        except Exception:
+            # Fallback to local files if network hiccup occurs
+            self._model = CrossEncoder(model_name, local_files_only=True)
 
     def rerank(self, query: str, docs: List[Document], top_n: int = TOP_K) -> List[Document]:
         """Score each doc against the query and return the top-n by score."""
@@ -41,6 +48,14 @@ class Reranker:
         return [doc for _, doc in scored[:top_n]]
 
 
+def get_reranker(model_name: str = RERANK_MODEL) -> Reranker:
+    """Singleton getter for the CrossEncoder reranker."""
+    global _GLOBAL_RERANKER
+    if _GLOBAL_RERANKER is None:
+        _GLOBAL_RERANKER = Reranker(model_name)
+    return _GLOBAL_RERANKER
+
+
 def build_reranking_retriever(vectorstore, reranker: Reranker | None = None):
     """Build a retriever that optionally reranks results.
 
@@ -49,14 +64,15 @@ def build_reranking_retriever(vectorstore, reranker: Reranker | None = None):
 
     Returns a callable: query -> list[Document]
     """
-    if RERANK_ENABLED and reranker:
+    if RERANK_ENABLED:
+        active_reranker = reranker or get_reranker()
         base_retriever = vectorstore.as_retriever(
             search_kwargs={"k": RERANK_CANDIDATES}
         )
 
         def reranking_retrieve(query: str) -> List[Document]:
             docs = base_retriever.invoke(query)
-            return reranker.rerank(query, docs, top_n=TOP_K)
+            return active_reranker.rerank(query, docs, top_n=TOP_K)
 
         return reranking_retrieve
 
