@@ -10,7 +10,7 @@ Two key rules baked into these prompts (and tested by eval):
 The prompts are separated from the chain so they can be read, tested, and
 modified independently.
 """
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 
 # Must match what eval/run_eval.py checks for in refusal accuracy.
 REFUSAL_TEXT = "The paper does not address this."
@@ -20,6 +20,7 @@ QA_SYSTEM = (
     "provided context chunks.\n\n"
     "Rules:\n"
     "- Use only information in the context. Do not use outside knowledge.\n"
+    "- (Exception: You may logically infer the paper's title and authors from the front matter chunks even if not explicitly labeled.)\n"
     "- After each sentence, cite the chunk(s) it came from like [C3] or [C3][C7].\n"
     "- If the context does not contain the answer, reply with exactly this and "
     f'nothing else:\n  "{REFUSAL_TEXT}"\n'
@@ -40,6 +41,7 @@ SUMMARY_SYSTEM = (
 
 qa_prompt = ChatPromptTemplate.from_messages([
     ("system", QA_SYSTEM),
+    MessagesPlaceholder(variable_name="history", optional=True),
     ("human", "CONTEXT:\n{context}\n\nQUESTION: {question}\n\nANSWER:"),
 ])
 
@@ -47,5 +49,6 @@ qa_prompt = ChatPromptTemplate.from_messages([
 
 summary_prompt = ChatPromptTemplate.from_messages([
     ("system", SUMMARY_SYSTEM),
+    MessagesPlaceholder(variable_name="history", optional=True),
     ("human", "CONTEXT:\n{context}\n\nREQUEST: {question}\n\nSUMMARY:"),
 ])

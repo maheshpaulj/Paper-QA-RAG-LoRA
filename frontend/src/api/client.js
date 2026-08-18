@@ -9,8 +9,8 @@ export const listPapers = async () => {
   return data;
 };
 
-export const askQuestion = async (question, indexName) => {
-  const { data } = await api.post('/ask', { question, index_name: indexName });
+export const askQuestion = async (question, indexName, history = []) => {
+  const { data } = await api.post('/ask', { question, index_name: indexName, history });
   return data;
 };
 

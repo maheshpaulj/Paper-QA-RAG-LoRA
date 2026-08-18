@@ -18,7 +18,10 @@ def ask_question(req: AskRequest):
             raise HTTPException(status_code=501, detail="RAG chain not implemented")
             
         chain = build_rag_chain(req.index_name)
-        result = chain.invoke({"question": req.question})
+        result = chain.invoke({
+            "question": req.question,
+            "history": req.history
+        })
         
         return AskResponse(
             question=req.question,

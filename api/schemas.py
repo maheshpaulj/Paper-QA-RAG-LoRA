@@ -1,12 +1,13 @@
 """Pydantic models for the Paper RAG API."""
 
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 
 class AskRequest(BaseModel):
     """Request model for asking a question."""
     question: str
     index_name: str
+    history: Optional[List[Dict[str, str]]] = []
 
 class ChunkSchema(BaseModel):
     """Schema representing a text chunk from a paper."""

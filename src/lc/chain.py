@@ -158,7 +158,7 @@ def _handle_metadata(state: dict) -> dict:
             metadata=front[0].metadata
         )
         
-    answer = _generate_answer(state["question"], front, state["llm"])
+    answer = _generate_answer(state["question"], front, state["llm"], state.get("history", []))
     return {
         "question": state["question"],
         "answer": answer,
@@ -177,7 +177,7 @@ def _handle_section(state: dict) -> dict:
         # Section not tagged — fall through to QA
         return _handle_qa(state)
 
-    answer = _generate_answer(state["question"], docs, state["llm"])
+    answer = _generate_answer(state["question"], docs, state["llm"], state.get("history", []))
     return {
         "question": state["question"],
         "answer": answer,
@@ -202,7 +202,7 @@ def _handle_figure(state: dict) -> dict:
         # Unknown figure number — fall through to QA
         return _handle_qa(state)
 
-    answer = _generate_answer(state["question"], docs, state["llm"])
+    answer = _generate_answer(state["question"], docs, state["llm"], state.get("history", []))
     return {
         "question": state["question"],
         "answer": answer,
@@ -227,7 +227,16 @@ def _handle_summary(state: dict) -> dict:
     # Use summary prompt instead of QA prompt
     context = _format_context(docs)
     chain = summary_prompt | state["llm"]
-    answer = chain.invoke({"context": context, "question": state["question"]}).content
+    
+    # Format history: filter out any 'error' roles
+    raw_history = state.get("history", [])
+    history = []
+    for msg in raw_history:
+        role = "ai" if msg.get("role") == "assistant" else msg.get("role")
+        if role in ["user", "ai"]:
+            history.append((role, msg.get("text") or msg.get("content") or ""))
+            
+    answer = chain.invoke({"context": context, "question": state["question"], "history": history}).content
     return {
         "question": state["question"],
         "answer": answer,
@@ -240,7 +249,7 @@ def _handle_qa(state: dict) -> dict:
     """The normal semantic-search path: FAISS top-20 → cross-encoder → top-5 → LLM."""
     retrieve = state["retrieve"]
     docs = retrieve(state["question"])
-    answer = _generate_answer(state["question"], docs, state["llm"])
+    answer = _generate_answer(state["question"], docs, state["llm"], state.get("history", []))
     return {
         "question": state["question"],
         "answer": answer,
@@ -249,14 +258,23 @@ def _handle_qa(state: dict) -> dict:
     }
 
 
-def _generate_answer(question: str, docs: list[Document], llm) -> str:
+def _generate_answer(question: str, docs: list[Document], llm, raw_history: list = None) -> str:
     """Run the QA prompt through the LLM. Handles figure images if present."""
     context = _format_context(docs)
+    
+    raw_history = raw_history or []
+    history = []
+    for msg in raw_history:
+        # FastAPI might send dicts with "role" and "text" or "content".
+        # Map frontend 'assistant' to LangChain 'ai'
+        role = "ai" if msg.get("role") == "assistant" else msg.get("role")
+        if role in ["user", "ai"]:
+            history.append((role, msg.get("text") or msg.get("content") or ""))
 
     # For now, use text-only generation (figure images go through the old path
     # when needed — the LLM sees the caption text which is usually sufficient).
     chain = qa_prompt | llm
-    result = chain.invoke({"context": context, "question": question})
+    result = chain.invoke({"context": context, "question": question, "history": history})
     return result.content
 
 
@@ -317,6 +335,7 @@ class RAGChain:
             "all_docs": self.all_docs,
             "retrieve": self.retrieve,
             "llm": self.llm,
+            "history": input_dict.get("history", []),
         }
 
         # RunnableBranch-style dispatch (explicit for clarity and debuggability)

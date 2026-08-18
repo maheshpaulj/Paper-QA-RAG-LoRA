@@ -98,7 +98,12 @@ const ChatPanel = ({
     setIsLoading(true);
 
     try {
-      const result = await askQuestion(q, paper.index_name);
+      const chatHistory = history
+        .filter(m => m.role === 'user' || m.role === 'assistant')
+        .slice(-8)
+        .map(m => ({ role: m.role, text: m.text }));
+        
+      const result = await askQuestion(q, paper.index_name, chatHistory);
       setHistory((prev) => [
         ...prev,
         {
@@ -301,6 +306,7 @@ const ChatPanel = ({
                                     title={targetChunk ? `View page ${targetChunk.page} in PDF` : `Citation ${citeId}`}
                                     onClick={() => {
                                       if (targetChunk) {
+                                        onChunksUpdate(msg.chunks || []);
                                         onNavigateToPage(targetChunk.page, targetChunk.id);
                                       }
                                     }}
